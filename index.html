@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PokerIQ — Texas Hold'em Mastery</title>
 <link rel="stylesheet" href="styles/main.css">
+<link rel="stylesheet" href="styles/auth.css">
 </head>
 <body>
 
@@ -17,6 +18,12 @@
     <span class="topbar-progress-label">Progress</span>
     <div class="topbar-progress-bar"><div class="topbar-progress-fill" id="topbar-fill" style="width:0%"></div></div>
     <span class="topbar-progress-pct" id="topbar-pct">0%</span>
+  </div>
+  <div class="auth-bar" id="auth-bar">
+    <button class="auth-btn signin" id="signin-btn-init">
+      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="" style="width:16px;height:16px;">
+      Sign in
+    </button>
   </div>
 </header>
 
@@ -65,6 +72,8 @@
 
   <!-- Main -->
   <main class="main">
+    <!-- Progress dashboard (shows when signed in) -->
+    <div id="progress-dashboard" class="progress-dashboard" style="margin:1.5rem 2rem 0;"></div>
 
     <!-- ─── 1. HAND RANKINGS ─── -->
     <section class="section-page" id="sec-hand-rankings">
@@ -898,11 +907,47 @@
         <button class="mark-complete-btn" data-section="glossary">✓ Mark Complete</button>
         <span class="mark-complete-note">Saves your progress automatically</span>
       </div>
+
+      <!-- Certificate Banner — unlocks when all 8 sections done -->
+      <div class="cert-banner" id="cert-banner">
+        <div class="suits">♠ ♥ ♦ ♣</div>
+        <h2>You've mastered Texas Hold'em!</h2>
+        <p>All 8 modules complete. Claim your PokerIQ certificate below.</p>
+        <p class="cert-progress-note" style="color:rgba(255,255,255,0.5);font-size:0.8rem"></p>
+        <button class="btn btn-accent" style="font-size:1rem;padding:0.75rem 2rem" onclick="openCertModal()">
+          🏆 Claim Your Certificate
+        </button>
+      </div>
     </section>
 
   </main>
 </div>
 
+<!-- Certificate Modal -->
+<div class="cert-modal" id="cert-modal">
+  <div class="cert-modal-inner">
+    <h2>🏆 Your Certificate</h2>
+    <p>Enter the name you want on the certificate, then download as PNG.</p>
+    <input
+      type="text"
+      class="cert-name-input"
+      id="cert-name-input"
+      placeholder="Enter your full name..."
+      oninput="drawCertificate(this.value)"
+    >
+    <canvas id="cert-canvas"></canvas>
+    <div class="cert-actions">
+      <button class="btn btn-accent" onclick="downloadCertificate()">⬇ Download PNG</button>
+      <button class="btn btn-secondary" onclick="closeCertModal()">Close</button>
+    </div>
+    <p class="cert-sync-note">
+      <span class="sync-dot" id="cert-sync-dot"></span>
+      Certificate is generated locally — no data is uploaded.
+    </p>
+  </div>
+</div>
+
 <script src="scripts/main.js"></script>
+<script type="module" src="scripts/auth.js"></script>
 </body>
 </html>

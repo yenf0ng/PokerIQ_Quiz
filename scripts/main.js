@@ -12,6 +12,9 @@ function saveProgress(p) {
 }
 function markSectionDone(id) {
   const p = getProgress(); p[id] = true; saveProgress(p); updateProgressUI();
+  if (typeof window.onSectionMarkedComplete === 'function') {
+    window.onSectionMarkedComplete(id);
+  }
 }
 function updateProgressUI() {
   const p = getProgress();

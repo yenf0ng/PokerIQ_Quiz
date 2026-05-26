@@ -40,7 +40,50 @@ python3 -m http.server 8080
 # Right-click index.html → Open with Live Server
 ```
 
-## Deploy to GitHub Pages
+## Setting up Firebase (Google Sign-In + Progress Sync)
+
+### Step 1 — Create a Firebase project
+1. Go to [console.firebase.google.com](https://console.firebase.google.com)
+2. Click **Add project** → name it `pokeriq` → Continue
+3. Disable Google Analytics (optional) → Create project
+
+### Step 2 — Enable Google Sign-In
+1. In your project → **Authentication** → **Get started**
+2. Under **Sign-in method** → enable **Google** → Save
+
+### Step 3 — Create Firestore database
+1. In your project → **Firestore Database** → **Create database**
+2. Choose **Start in test mode** (for development)
+3. Select a region → Enable
+
+### Step 4 — Get your web app config
+1. Project Overview → click **</>** (web app) → Register app
+2. Copy the `firebaseConfig` object shown
+3. Paste it into `scripts/auth.js` replacing the `YOUR_*` placeholders
+
+### Step 5 — Set Firestore security rules
+In Firestore → **Rules**, replace with:
+```
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}
+```
+Click **Publish**.
+
+### Step 6 — Customise your certificate
+In `scripts/auth.js`, edit the three branding constants at the top:
+```js
+const CERT_ISSUER    = "PokerIQ Academy";     // shown at top
+const CERT_COURSE    = "Texas Hold'em Mastery"; // course title
+const CERT_SIGNATURE = "PokerIQ";              // signature line
+```
+
+
 
 ### Step 1 — Create a GitHub repository
 

@@ -1,0 +1,102 @@
+/* ── Auth Bar ── */
+.auth-bar {
+  display: flex; align-items: center; gap: 0.75rem;
+  margin-left: auto; padding-right: 0;
+}
+.auth-btn {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.4rem 0.9rem; border-radius: 6px; border: 1px solid rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.08); color: #fff;
+  font-family: var(--font-body); font-size: 0.8rem; font-weight: 500;
+  cursor: pointer; transition: background 0.15s;
+  white-space: nowrap;
+}
+.auth-btn:hover { background: rgba(255,255,255,0.16); }
+.auth-btn.signin { background: #fff; color: #1a1a1a; border-color: #fff; }
+.auth-btn.signin:hover { background: #f0f0f0; }
+.auth-btn img { width: 16px; height: 16px; }
+.user-avatar {
+  width: 30px; height: 30px; border-radius: 50%;
+  border: 2px solid var(--accent); object-fit: cover;
+}
+.user-name {
+  font-size: 0.8rem; color: rgba(255,255,255,0.8);
+  max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+/* ── Certificate Modal ── */
+.cert-modal {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.75); z-index: 300;
+  align-items: center; justify-content: center; padding: 1rem;
+}
+.cert-modal.open { display: flex; }
+.cert-modal-inner {
+  background: var(--bg-card); border-radius: var(--radius-lg);
+  padding: 1.5rem; max-width: 740px; width: 100%;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.3);
+  max-height: 90vh; overflow-y: auto;
+}
+.cert-modal-inner h2 {
+  font-family: var(--font-display); font-size: 1.4rem; color: var(--felt);
+  margin-bottom: 0.25rem;
+}
+.cert-modal-inner p { font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1rem; }
+#cert-canvas {
+  width: 100%; border: 1px solid var(--border);
+  border-radius: var(--radius); display: block; margin-bottom: 1rem;
+}
+.cert-name-input {
+  width: 100%; padding: 0.65rem 0.9rem; border: 1px solid var(--border-strong);
+  border-radius: var(--radius); font-family: var(--font-body); font-size: 1rem;
+  color: var(--text); background: var(--bg); margin-bottom: 0.75rem;
+  outline: none; transition: border-color 0.15s;
+}
+.cert-name-input:focus { border-color: var(--accent); }
+.cert-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+.cert-sync-note {
+  font-size: 0.78rem; color: var(--text-light);
+  margin-top: 0.5rem; display: flex; align-items: center; gap: 0.4rem;
+}
+
+/* ── Certificate Banner (in-page) ── */
+.cert-banner {
+  background: linear-gradient(135deg, var(--felt) 0%, #2a4a2a 100%);
+  border-radius: var(--radius-lg); padding: 2rem;
+  text-align: center; margin-top: 2rem; display: none;
+}
+.cert-banner.show { display: block; }
+.cert-banner h2 {
+  font-family: var(--font-display); font-size: 1.5rem;
+  color: var(--accent); margin-bottom: 0.5rem;
+}
+.cert-banner p { font-size: 0.9rem; color: rgba(255,255,255,0.7); margin-bottom: 1.25rem; }
+.cert-banner .suits { font-size: 1.5rem; letter-spacing: 0.5rem; margin-bottom: 1rem; }
+
+/* ── Progress Dashboard ── */
+.progress-dashboard {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 1.25rem;
+  margin-bottom: 1.5rem; display: none;
+}
+.progress-dashboard.show { display: block; }
+.dash-title { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--text-light); margin-bottom: 0.75rem; }
+.dash-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; }
+.dash-stat { text-align: center; }
+.dash-stat-num { font-family: var(--font-display); font-size: 1.5rem;
+  color: var(--felt); font-weight: 700; }
+.dash-stat-label { font-size: 0.7rem; color: var(--text-muted); margin-top: 2px; }
+
+/* ── Sync indicator ── */
+.sync-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #4caf50; display: inline-block; margin-right: 4px;
+}
+.sync-dot.offline { background: var(--text-light); }
+
+@media (max-width: 768px) {
+  .user-name { display: none; }
+  .dash-grid { grid-template-columns: repeat(2, 1fr); }
+  .auth-bar { gap: 0.5rem; }
+}
