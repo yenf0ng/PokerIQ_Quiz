@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PokerIQ — Texas Hold'em Mastery</title>
+<link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+
+<!-- Topbar -->
+<header class="topbar">
+  <button class="menu-toggle" aria-label="Toggle menu">☰</button>
+  <div class="topbar-logo">Poker<span>IQ</span></div>
+  <span class="topbar-tagline">Texas Hold'em Mastery</span>
+  <div class="topbar-progress">
+    <span class="topbar-progress-label">Progress</span>
+    <div class="topbar-progress-bar"><div class="topbar-progress-fill" id="topbar-fill" style="width:0%"></div></div>
+    <span class="topbar-progress-pct" id="topbar-pct">0%</span>
+  </div>
+</header>
+
+<div class="overlay"></div>
+
+<div class="layout">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header"><h3>Course Sections</h3></div>
+    <nav class="sidebar-nav">
+      <button class="nav-item" data-section="hand-rankings">
+        <span class="nav-icon">🃏</span><span class="nav-label">Hand Rankings</span>
+        <span class="nav-check" data-section="hand-rankings"></span>
+      </button>
+      <button class="nav-item" data-section="playstyle">
+        <span class="nav-icon">♟</span><span class="nav-label">Playstyle Types</span>
+        <span class="nav-check" data-section="playstyle"></span>
+      </button>
+      <button class="nav-item" data-section="odds-calc">
+        <span class="nav-icon">🎲</span><span class="nav-label">Odds Calculator</span>
+        <span class="nav-check" data-section="odds-calc"></span>
+      </button>
+      <button class="nav-item" data-section="pot-odds">
+        <span class="nav-icon">💰</span><span class="nav-label">Pot Odds & Equity</span>
+        <span class="nav-check" data-section="pot-odds"></span>
+      </button>
+      <button class="nav-item" data-section="positions">
+        <span class="nav-icon">🗺</span><span class="nav-label">Positional Play</span>
+        <span class="nav-check" data-section="positions"></span>
+      </button>
+      <button class="nav-item" data-section="bluffing">
+        <span class="nav-icon">🎭</span><span class="nav-label">Bluffing & Reads</span>
+        <span class="nav-check" data-section="bluffing"></span>
+      </button>
+      <button class="nav-item" data-section="bankroll">
+        <span class="nav-icon">📊</span><span class="nav-label">Bankroll Management</span>
+        <span class="nav-check" data-section="bankroll"></span>
+      </button>
+      <button class="nav-item" data-section="glossary">
+        <span class="nav-icon">📖</span><span class="nav-label">Glossary</span>
+        <span class="nav-check" data-section="glossary"></span>
+      </button>
+    </nav>
+    <div class="sidebar-footer">PokerIQ · Free to learn · No signup needed</div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+
+    <!-- ─── 1. HAND RANKINGS ─── -->
+    <section class="section-page" id="sec-hand-rankings">
+      <div class="section-header">
+        <div class="section-eyebrow">♠ Section 1 of 8</div>
+        <h1 class="section-title">Hand Rankings</h1>
+        <p class="section-intro">The foundation of poker. Know these cold before anything else — from the unbeatable Royal Flush to the humble High Card.</p>
+      </div>
+
+      <div class="hand-rank-item">
+        <div class="hand-rank-num">1</div>
+        <div class="card-hand">
+          <div class="playing-card red"><span class="rank">A♥</span><span class="suit-center">♥</span><span class="rank-bot">A♥</span></div>
+          <div class="playing-card red"><span class="rank">K♥</span><span class="suit-center">♥</span><span class="rank-bot">K♥</span></div>
+          <div class="playing-card red"><span class="rank">Q♥</span><span class="suit-center">♥</span><span class="rank-bot">Q♥</span></div>
+          <div class="playing-card red"><span class="rank">J♥</span><span class="suit-center">♥</span><span class="rank-bot">J♥</span></div>
+          <div class="playing-card red"><span class="rank">T♥</span><span class="suit-center">♥</span><span class="rank-bot">T♥</span></div>
+        </div>
+        <div class="hand-rank-info">
+          <div class="hand-rank-name">Royal Flush</div>
+          <div class="hand-rank-desc">A-K-Q-J-T all of the same suit. The best hand in poker — unbeatable.</div>
+        </div>
+      </div>
+
+      <div class="hand-rank-item">
+        <div class="hand-rank-num">2</div>
+        <div class="card-hand">
+          <div class="playing-card"><span class="rank">9♠</span><span class="suit-center">♠</span><span class="rank-bot">9♠</span></div>
+          <div class="playing-card"><span class="rank">8♠</span><span class="suit-center">♠</span><span class="rank-bot">8♠</span></div>
+          <div class="playing-card"><span class="rank">7♠</span><span class="suit-center">♠</span><span class="rank-bot">7♠</span></div>
+          <div class="playing-card"><span class="rank">6♠</span><span class="suit-center">♠</span><span class="rank-bot">6♠</span></div>
+          <div class="playing-card"><span class="rank">5♠</span><span class="suit-center">♠</span><span class="rank-bot">5♠</span></div>
+        </div>
+        <div class="hand-rank-info">
+          <div class="hand-rank-name">Straight Flush</div>
+          <div class="hand-rank-desc">Five consecutive cards of the same suit. Incredibly rare and powerful.</div>
+        </div>
+      </div>
+
+      <div class="hand-rank-item">
+        <div class="hand-rank-num">3</div>
+        <div class="card-hand">
+          <div class="playing-card red"><span class="rank">K♦</span><span class="suit-center">♦</span><span class="rank-bot">K♦</span></div>
+          <div class="playing-card"><span class="rank">K♣</span><span class="suit-center">♣</span><span class="rank-bot">K♣</span></div>
+          <div class="playing-card"><span class="rank">K♠</span><span class="suit-center">♠</span><span class="rank-bot">K♠</span></div>
+          <div class="playing-card red"><span class="rank">K♥</span><span class="suit-center">♥</span><span class="rank-bot">K♥</span></div>
+          <div class="playing-card"><span class="rank">7♠</span><span class="suit-center">♠</span><span class="rank-bot">7♠</span></div>
+        </div>
+        <div class="hand-rank-info">
+          <div class="hand-rank-name">Four of a Kind (Quads)</div>
+          <div class="hand-rank-desc">All four cards of the same rank. A monster hand — almost always wins.</div>
+        </div>
+      </div>
+
+      <div class="hand-rank-item">
+        <div class="hand-rank-num">4</div>
+        <div class="card-hand">
+          <div class="playing-card red"><span class="rank">Q♥</span><span class="suit-center">♥</span><span class="rank-bot">Q♥</span></div>
+          <div class="playing-card"><span class="rank">Q♠</span><span class="suit-center">♠</span><span class="rank-bot">Q♠</span></div>
+          <div class="playing-card red"><span class="rank">Q♦</span><span class="suit-center">♦</span><span class="rank-bot">Q♦</span></div>
+          <div class="playing-card red"><span class="rank">7♥</span><span class="suit-center">♥</span><span class="rank-bot">7♥</span></div>
+          <div class="playing-card"><span class="rank">7♣</span><span class="suit-center">♣</span><span class="rank-bot">7♣</span></div>
+        </div>
+        <div class="hand-rank-info">
+          <div class="hand-rank-name">Full House</div>
+          <div class="hand-rank-desc">Three of a kind + a pair. "Queens full of sevens." Ranked by the trips first.</div>
+        </div>
+      </div>
+
+      <div class="hand-rank-item">
+        <div class="hand-rank-num">5</div>
+        <div class="card-hand">
+          <div class="playing-card red"><span class="rank">A♥</span><span class="suit-center">♥</span><span class="rank-bot">A♥</span></div>
+          <div class="playing-card red"><span class="rank">J♥</span><span class="suit-center">♥</span><span class="rank-bot">J♥</span></div>
+          <div class="playing-card red"><span class="rank">8♥</span><span class="suit-center">♥</span><span class="rank-bot">8♥</span></div>
+          <div class="playing-card red"><span class="rank">6♥</span><span class="suit-center">♥</span><span class="rank-bot">6♥</span></div>
+          <div class="playing-card red"><span class="rank">2♥</span><span class="suit-center">♥</span><span class="rank-bot">2♥</span></div>
+        </div>
+        <div class="hand-rank-info">
+          <div class="hand-rank-name">Flush</div>
+          <div class="hand-rank-desc">Five cards of the same suit, not in sequence. Ranked by highest card.</div>
+        </div>
+      </div>
+
+      <div class="hand-rank-item">
+        <div class="hand-rank-num">6</div>
+        <div class="card-hand">
+          <div class="playing-card"><span class="rank">9♠</span><span class="suit-center">♠</span><span class="rank-bot">9♠</span></div>
+          <div class="playing-card red"><span class="rank">8♥</span><span class="suit-center">♥</span><span class="rank-bot">8♥</span></div>
+          <div class="playing-card"><span class="rank">7♣</span><span class="suit-center">♣</span><span class="rank-bot">7♣</span></div>
+          <div class="playing-card red"><span class="rank">6♦</span><span class="suit-center">♦</span><span class="rank-bot">6♦</span></div>
+          <div class="playing-card"><span class="rank">5♠</span><span class="suit-center">♠</span><span class="rank-bot">5♠</span></div>
+        </div>
+        <div class="hand-rank-info">
+          <div class="hand-rank-name">Straight</div>
+          <div class="hand-rank-desc">Five consecutive cards of mixed suits. Ace can be high (A-K-Q-J-T) or low (A-2-3-4-5).</div>
+        </div>
+      </div>
+
+      <div class="hand-rank-item">
+        <div class="hand-rank-num">7</div>
+        <div class="card-hand">
+          <div class="playing-card red"><span class="rank">T♥</span><span class="suit-center">♥</span><span class="rank-bot">T♥</span></div>
+          <div class="playing-card"><span class="rank">T♠</span><span class="suit-center">♠</span><span class="rank-bot">T♠</span></div>
+          <div class="playing-card red"><span class="rank">T♦</span><span class="suit-center">♦</span><span class="rank-bot">T♦</span></div>
+          <div class="playing-card"><span class="rank">K♣</span><span class="suit-center">♣</span><span class="rank-bot">K♣</span></div>
+          <div class="playing-card red"><span class="rank">3♥</span><span class="suit-center">♥</span><span class="rank-bot">3♥</span></div>
+        </div>
+        <div class="hand-rank-info">
+          <div class="hand-rank-name">Three of a Kind (Trips / Set)</div>
+          <div class="hand-rank-desc">Three cards of the same rank. "Trips" = one in hand + two on board. "Set" = pocket pair + one on board.</div>
+        </div>
+      </div>
+
+      <div class="hand-rank-item">
+        <div class="hand-rank-num">8</div>
+        <div class="card-hand">
+          <div class="playing-card red"><span class="rank">A♥</span><span class="suit-center">♥</span><span class="rank-bot">A♥</span></div>
+          <div class="playing-card"><span class="rank">A♠</span><span class="suit-center">♠</span><span class="rank-bot">A♠</span></div>
+          <div class="playing-card red"><span class="rank">5♦</span><span class="suit-center">♦</span><span class="rank-bot">5♦</span></div>
+          <div class="playing-card"><span class="rank">5♣</span><span class="suit-center">♣</span><span class="rank-bot">5♣</span></div>
+          <div class="playing-card"><span class="rank">J♠</span><span class="suit-center">♠</span><span class="rank-bot">J♠</span></div>
+        </div>
+        <div class="hand-rank-info">
+          <div class="hand-rank-name">Two Pair</div>
+          <div class="hand-rank-desc">Two different pairs. Ranked by the highest pair, then second pair, then kicker.</div>
+        </div>
+      </div>
+
+      <div class="hand-rank-item">
+        <div class="hand-rank-num">9</div>
+        <div class="card-hand">
+          <div class="playing-card"><span class="rank">K♠</span><span class="suit-center">♠</span><span class="rank-bot">K♠</span></div>
+          <div class="playing-card red"><span class="rank">K♥</span><span class="suit-center">♥</span><span class="rank-bot">K♥</span></div>
+          <div class="playing-card"><span class="rank">7♣</span><span class="suit-center">♣</span><span class="rank-bot">7♣</span></div>
+          <div class="playing-card red"><span class="rank">3♦</span><span class="suit-center">♦</span><span class="rank-bot">3♦</span></div>
+          <div class="playing-card"><span class="rank">9♠</span><span class="suit-center">♠</span><span class="rank-bot">9♠</span></div>
+        </div>
+        <div class="hand-rank-info">
+          <div class="hand-rank-name">One Pair</div>
+          <div class="hand-rank-desc">Two cards of the same rank. Very common — wins often in single-raised pots.</div>
+        </div>
+      </div>
+
+      <div class="hand-rank-item">
+        <div class="hand-rank-num">10</div>
+        <div class="card-hand">
+          <div class="playing-card"><span class="rank">A♠</span><span class="suit-center">♠</span><span class="rank-bot">A♠</span></div>
+          <div class="playing-card"><span class="rank">J♣</span><span class="suit-center">♣</span><span class="rank-bot">J♣</span></div>
+          <div class="playing-card red"><span class="rank">8♥</span><span class="suit-center">♥</span><span class="rank-bot">8♥</span></div>
+          <div class="playing-card red"><span class="rank">6♦</span><span class="suit-center">♦</span><span class="rank-bot">6♦</span></div>
+          <div class="playing-card"><span class="rank">2♣</span><span class="suit-center">♣</span><span class="rank-bot">2♣</span></div>
+        </div>
+        <div class="hand-rank-info">
+          <div class="hand-rank-name">High Card</div>
+          <div class="hand-rank-desc">No combination. The highest card plays. Rarely wins at showdown.</div>
+        </div>
+      </div>
+
+      <div class="info-box"><strong>Quick memory tip:</strong> Royal → Straight Flush → Quads → Full House → Flush → Straight → Trips → Two Pair → Pair → High Card. Suits never determine hand rank in Hold'em.</div>
+
+      <!-- Hand Tester -->
+      <h2 style="font-family:var(--font-display);font-size:1.3rem;color:var(--felt);margin:2rem 0 1rem;">Hand Strength Tester</h2>
+      <div class="hand-tester">
+        <h3>Can you name this hand?</h3>
+        <p style="font-size:0.85rem;color:rgba(255,255,255,0.6);margin-bottom:0.5rem">A new 5-card hand is dealt. Select the hand type.</p>
+        <div class="hand-tester-cards" id="tester-cards"></div>
+        <div class="guess-options">
+          <button class="guess-btn" onclick="guessHand(0)">High Card</button>
+          <button class="guess-btn" onclick="guessHand(1)">One Pair</button>
+          <button class="guess-btn" onclick="guessHand(2)">Two Pair</button>
+          <button class="guess-btn" onclick="guessHand(3)">Three of a Kind</button>
+          <button class="guess-btn" onclick="guessHand(4)">Straight</button>
+          <button class="guess-btn" onclick="guessHand(5)">Flush</button>
+          <button class="guess-btn" onclick="guessHand(6)">Full House</button>
+          <button class="guess-btn" onclick="guessHand(7)">Four of a Kind</button>
+          <button class="guess-btn" onclick="guessHand(8)">Straight Flush</button>
+        </div>
+        <div class="tester-result" id="tester-result"></div>
+        <button class="btn btn-secondary" id="tester-deal" style="margin-top:0.75rem;background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.2);color:#fff">↺ Deal New Hand</button>
+      </div>
+
+      <!-- Quiz -->
+      <div class="quiz-wrap" id="quiz-hand-rankings">
+        <div class="quiz-title">♠ Knowledge Check — Hand Rankings</div>
+        <div class="quiz-progress-dots"></div>
+        <div class="quiz-q"></div>
+        <div class="quiz-options"></div>
+        <div class="quiz-feedback"></div>
+        <div class="quiz-nav"></div>
+        <div class="complete-banner"><span class="score"></span><span>correct! Section quiz complete.</span></div>
+      </div>
+      <div class="mark-complete-bar">
+        <button class="mark-complete-btn" data-section="hand-rankings">✓ Mark Complete</button>
+        <span class="mark-complete-note">Saves your progress automatically</span>
+      </div>
+    </section>
+
+    <!-- ─── 2. PLAYSTYLE TYPES ─── -->
+    <section class="section-page" id="sec-playstyle">
+      <div class="section-header">
+        <div class="section-eyebrow">♥ Section 2 of 8</div>
+        <h1 class="section-title">Playstyle Types</h1>
+        <p class="section-intro">Every poker player falls into a style. Recognising your own — and your opponents' — is one of the fastest ways to improve your win rate.</p>
+      </div>
+
+      <div class="playstyle-card">
+        <div class="playstyle-header"><span class="playstyle-badge playstyle-tag">TAG</span></div>
+        <div class="playstyle-body">
+          <div class="playstyle-name">Tight Aggressive</div>
+          <div class="playstyle-desc">The gold-standard style for most cash games. TAG players are selective about which hands they enter with (tight), but once in, they bet and raise confidently (aggressive). Think of it as a sniper: wait for the right moment, then strike with force.</div>
+          <div class="pros-cons">
+            <div class="pro-list"><div class="list-label">✓ Pros</div><ul>
+              <li>Strong long-term win rate</li><li>Easy to execute consistently</li><li>Avoids marginal spots</li><li>Respected at the table</li>
+            </ul></div>
+            <div class="con-list"><div class="list-label">✗ Cons</div><ul>
+              <li>Predictable to good players</li><li>Folds too much to blind pressure</li><li>Can be exploited by LAGs</li><li>Less fun / social</li>
+            </ul></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="playstyle-card">
+        <div class="playstyle-header"><span class="playstyle-badge playstyle-lag">LAG</span></div>
+        <div class="playstyle-body">
+          <div class="playstyle-name">Loose Aggressive</div>
+          <div class="playstyle-desc">LAGs play many hands and apply constant pressure with bets and raises. This style is extremely profitable at high levels but requires excellent hand-reading skills and strong emotional control. The best poker players in the world tend to be LAGs.</div>
+          <div class="pros-cons">
+            <div class="pro-list"><div class="list-label">✓ Pros</div><ul>
+              <li>Highest ceiling win rate</li><li>Hard to put on a hand</li><li>Controls table dynamics</li><li>More pots contested</li>
+            </ul></div>
+            <div class="con-list"><div class="list-label">✗ Cons</div><ul>
+              <li>High variance swings</li><li>Requires advanced reads</li><li>Easy to misexecute</li><li>Tilt-prone</li>
+            </ul></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="playstyle-card">
+        <div class="playstyle-header"><span class="playstyle-badge playstyle-nit">NIT</span></div>
+        <div class="playstyle-body">
+          <div class="playstyle-name">Nit (Tight Passive)</div>
+          <div class="playstyle-desc">Nits play only premium hands and rarely bet aggressively. They sit and wait for the absolute nuts before committing chips — which is exactly why they're exploitable. Observant players will fold every time a Nit shows aggression, costing them value.</div>
+          <div class="pros-cons">
+            <div class="pro-list"><div class="list-label">✓ Pros</div><ul>
+              <li>Low risk of big losses</li><li>Easy to maintain discipline</li><li>Strong hand selection</li>
+            </ul></div>
+            <div class="con-list"><div class="list-label">✗ Cons</div><ul>
+              <li>Very low win rate</li><li>Misses profitable spots</li><li>Easily exploited by bluffs</li><li>Boring to play against</li>
+            </ul></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="playstyle-card">
+        <div class="playstyle-header"><span class="playstyle-badge playstyle-fish">FISH</span></div>
+        <div class="playstyle-body">
+          <div class="playstyle-name">Fish (Loose Passive)</div>
+          <div class="playstyle-desc">Also called a "calling station", Fish play too many hands and call too often without raising. They often see showdowns with weak holdings. The good news? Fish are the primary source of profit in most games. Don't be a Fish — but be happy when you find one.</div>
+          <div class="pros-cons">
+            <div class="pro-list"><div class="list-label">✓ From a study angle</div><ul>
+              <li>Very low stress</li><li>See lots of flops</li><li>Learn by experience</li>
+            </ul></div>
+            <div class="con-list"><div class="list-label">✗ In practice</div><ul>
+              <li>Consistent loser long-term</li><li>Overpays for draws</li><li>No fold equity</li><li>Bleeds chips slowly</li>
+            </ul></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="playstyle-card">
+        <div class="playstyle-header"><span class="playstyle-badge playstyle-gto">GTO</span></div>
+        <div class="playstyle-body">
+          <div class="playstyle-name">GTO (Game Theory Optimal)</div>
+          <div class="playstyle-desc">GTO is not a "style" in the traditional sense — it's a mathematically balanced strategy that cannot be exploited. GTO players mix bluffs and value bets in precise ratios. It's most relevant in high-stakes or tournament play where opponents actively try to exploit imbalances.</div>
+          <div class="pros-cons">
+            <div class="pro-list"><div class="list-label">✓ Pros</div><ul>
+              <li>Unexploitable baseline</li><li>Works vs all opponents</li><li>Strong in tough lineups</li><li>Built on solid theory</li>
+            </ul></div>
+            <div class="con-list"><div class="list-label">✗ Cons</div><ul>
+              <li>Complex to execute</li><li>Less exploitative EV</li><li>Overkill vs bad players</li><li>Solver-dependent study</li>
+            </ul></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tip-box"><strong>For casual players:</strong> Start with TAG. It's the most forgiving style, produces consistent results, and builds the discipline needed to eventually add LAG elements to your game.</div>
+
+      <div class="quiz-wrap" id="quiz-playstyle">
+        <div class="quiz-title">♥ Knowledge Check — Playstyle Types</div>
+        <div class="quiz-progress-dots"></div>
+        <div class="quiz-q"></div>
+        <div class="quiz-options"></div>
+        <div class="quiz-feedback"></div>
+        <div class="quiz-nav"></div>
+        <div class="complete-banner"><span class="score"></span><span>correct! Section quiz complete.</span></div>
+      </div>
+      <div class="mark-complete-bar">
+        <button class="mark-complete-btn" data-section="playstyle">✓ Mark Complete</button>
+        <span class="mark-complete-note">Saves your progress automatically</span>
+      </div>
+    </section>
+
+    <!-- ─── 3. ODDS CALCULATOR ─── -->
+    <section class="section-page" id="sec-odds-calc">
+      <div class="section-header">
+        <div class="section-eyebrow">♦ Section 3 of 8</div>
+        <h1 class="section-title">Poker Odds Calculator</h1>
+        <p class="section-intro">Select your hole cards and any board cards to calculate your equity — the percentage chance of winning at showdown.</p>
+      </div>
+
+      <div class="card">
+        <h3 style="font-size:0.85rem;font-weight:600;color:var(--text-muted);margin-bottom:0.75rem;text-transform:uppercase;letter-spacing:0.08em">Your Hole Cards</h3>
+        <div class="card-picker" id="hole-picker"></div>
+        <h3 style="font-size:0.85rem;font-weight:600;color:var(--text-muted);margin:1rem 0 0.75rem;text-transform:uppercase;letter-spacing:0.08em">Board Cards (optional)</h3>
+        <div class="card-picker" id="board-picker"></div>
+        <div style="display:flex;gap:0.75rem;margin-top:1.25rem;flex-wrap:wrap">
+          <button class="btn btn-primary" id="calc-btn">Calculate Equity</button>
+          <button class="btn btn-secondary" id="clear-btn">Clear All</button>
+        </div>
+      </div>
+
+      <div id="odds-result" style="display:none">
+        <div class="odds-result">
+          <div style="display:flex;align-items:baseline;gap:1rem;flex-wrap:wrap">
+            <div>
+              <div style="font-size:0.75rem;color:rgba(255,255,255,0.5);margin-bottom:2px">Your Equity</div>
+              <div style="font-family:var(--font-display);font-size:2.5rem;color:var(--accent);font-weight:700" id="equity-pct">—</div>
+            </div>
+          </div>
+          <div class="odds-bars">
+            <div class="odds-bar-row">
+              <div class="odds-bar-label"><span>Win</span><span id="win-pct-label"></span></div>
+              <div class="odds-bar-track"><div class="odds-bar-fill" id="win-bar" style="background:#4caf50;width:0%"></div></div>
+            </div>
+            <div class="odds-bar-row">
+              <div class="odds-bar-label"><span>Tie</span><span></span></div>
+              <div class="odds-bar-track"><div class="odds-bar-fill" id="tie-bar" style="background:var(--accent);width:0%"></div></div>
+            </div>
+            <div class="odds-bar-row">
+              <div class="odds-bar-label"><span>Lose</span><span></span></div>
+              <div class="odds-bar-track"><div class="odds-bar-fill" id="lose-bar" style="background:var(--red-light);width:0%"></div></div>
+            </div>
+          </div>
+          <div id="outs-info" style="margin-top:0.75rem;font-size:0.8rem;color:rgba(255,255,255,0.55)"></div>
+        </div>
+      </div>
+
+      <div class="info-box" style="margin-top:1.5rem"><strong>How it works:</strong> Uses Monte Carlo simulation (5,000 random runouts) vs one opponent. Results are approximate but highly accurate. More board cards = more precise results.</div>
+
+      <!-- Card Modal -->
+      <div class="card-modal" id="card-modal">
+        <div class="card-modal-inner">
+          <h3>Select a card</h3>
+          <div id="modal-cards"></div>
+          <button class="btn btn-secondary" id="modal-close" style="margin-top:0.75rem;width:100%">Cancel</button>
+        </div>
+      </div>
+
+      <div class="quiz-wrap" id="quiz-odds-calc">
+        <div class="quiz-title">♦ Knowledge Check — Poker Odds</div>
+        <div class="quiz-progress-dots"></div>
+        <div class="quiz-q"></div>
+        <div class="quiz-options"></div>
+        <div class="quiz-feedback"></div>
+        <div class="quiz-nav"></div>
+        <div class="complete-banner"><span class="score"></span><span>correct! Section quiz complete.</span></div>
+      </div>
+      <div class="mark-complete-bar">
+        <button class="mark-complete-btn" data-section="odds-calc">✓ Mark Complete</button>
+        <span class="mark-complete-note">Saves your progress automatically</span>
+      </div>
+    </section>
+
+    <!-- ─── 4. POT ODDS & EQUITY ─── -->
+    <section class="section-page" id="sec-pot-odds">
+      <div class="section-header">
+        <div class="section-eyebrow">♣ Section 4 of 8</div>
+        <h1 class="section-title">Pot Odds & Equity</h1>
+        <p class="section-intro">The single most important mathematical concept in poker. Master pot odds and you'll never make a fundamentally losing call again.</p>
+      </div>
+
+      <div class="card">
+        <h2 style="font-family:var(--font-display);font-size:1.2rem;color:var(--felt);margin-bottom:0.75rem">What Are Pot Odds?</h2>
+        <p style="font-size:0.9rem;color:var(--text-muted);line-height:1.7">Pot odds are the ratio of the amount you must call versus the total pot after your call. They tell you how often you need to win the hand for the call to be profitable.</p>
+        <div class="info-box" style="margin-top:1rem"><strong>Formula:</strong> Pot Odds % = Call Amount ÷ (Pot + Call Amount) × 100</div>
+        <p style="font-size:0.9rem;color:var(--text-muted);line-height:1.7;margin-top:0.75rem"><strong style="color:var(--felt)">Example:</strong> Pot is $100, opponent bets $50. You call $50 into a $150 total pot. Pot odds = 50 ÷ 150 = 33%. You need to win at least 33% of the time for the call to break even.</p>
+      </div>
+
+      <div class="card" style="margin-top:1rem">
+        <h2 style="font-family:var(--font-display);font-size:1.2rem;color:var(--felt);margin-bottom:0.75rem">What Are Outs?</h2>
+        <p style="font-size:0.9rem;color:var(--text-muted);line-height:1.7">Outs are cards remaining in the deck that will improve your hand to (likely) the winner.</p>
+        <div class="grid-2" style="margin-top:1rem">
+          <div style="background:var(--bg);border-radius:var(--radius);padding:1rem">
+            <div style="font-weight:600;font-size:0.85rem;color:var(--felt);margin-bottom:0.5rem">Common Draw Outs</div>
+            <table style="width:100%;font-size:0.8rem;border-collapse:collapse">
+              <tr><td style="padding:3px 0;color:var(--text-muted)">Flush draw</td><td style="text-align:right;font-weight:500">9 outs</td></tr>
+              <tr><td style="padding:3px 0;color:var(--text-muted)">Open-ended straight</td><td style="text-align:right;font-weight:500">8 outs</td></tr>
+              <tr><td style="padding:3px 0;color:var(--text-muted)">Gutshot straight</td><td style="text-align:right;font-weight:500">4 outs</td></tr>
+              <tr><td style="padding:3px 0;color:var(--text-muted)">Two overcards</td><td style="text-align:right;font-weight:500">6 outs</td></tr>
+              <tr><td style="padding:3px 0;color:var(--text-muted)">One overcard</td><td style="text-align:right;font-weight:500">3 outs</td></tr>
+              <tr><td style="padding:3px 0;color:var(--text-muted)">Set → full house</td><td style="text-align:right;font-weight:500">7 outs</td></tr>
+            </table>
+          </div>
+          <div style="background:var(--bg);border-radius:var(--radius);padding:1rem">
+            <div style="font-weight:600;font-size:0.85rem;color:var(--felt);margin-bottom:0.5rem">Rule of 4 & 2</div>
+            <p style="font-size:0.8rem;color:var(--text-muted);line-height:1.6">Quick equity estimation:</p>
+            <p style="font-size:0.8rem;color:var(--text-muted);line-height:1.6;margin-top:0.4rem"><strong style="color:var(--felt)">On the flop</strong> (2 cards to come): Outs × 4 ≈ equity %</p>
+            <p style="font-size:0.8rem;color:var(--text-muted);line-height:1.6;margin-top:0.4rem"><strong style="color:var(--felt)">On the turn</strong> (1 card to come): Outs × 2 ≈ equity %</p>
+            <p style="font-size:0.8rem;color:var(--text-muted);line-height:1.6;margin-top:0.4rem">Example: 9 outs on the flop → 9×4 = ~36% equity</p>
+          </div>
+        </div>
+      </div>
+
+      <h2 style="font-family:var(--font-display);font-size:1.3rem;color:var(--felt);margin:1.5rem 0 1rem">Interactive Pot Odds Calculator</h2>
+      <div class="pot-calc">
+        <div class="grid-2">
+          <div>
+            <label>Current pot size ($)</label>
+            <input type="number" id="pot-size" placeholder="e.g. 100" min="0">
+          </div>
+          <div>
+            <label>Opponent's bet ($)</label>
+            <input type="number" id="bet-size" placeholder="e.g. 50" min="0">
+          </div>
+        </div>
+        <label>Your outs (0 if unknown)</label>
+        <input type="number" id="outs-input" placeholder="e.g. 9 for flush draw" min="0" max="47">
+        <div class="pot-result">
+          <div class="grid-2">
+            <div>
+              <div class="pot-result-label">Pot Odds Required</div>
+              <div class="pot-result-big" id="pot-odds-result">—</div>
+            </div>
+            <div>
+              <div class="pot-result-label">Your Equity (from outs)</div>
+              <div class="pot-result-big" id="equity-result">—</div>
+            </div>
+          </div>
+          <div id="decision-result" style="display:none"></div>
+        </div>
+      </div>
+
+      <div class="quiz-wrap" id="quiz-pot-odds">
+        <div class="quiz-title">♣ Knowledge Check — Pot Odds</div>
+        <div class="quiz-progress-dots"></div>
+        <div class="quiz-q"></div>
+        <div class="quiz-options"></div>
+        <div class="quiz-feedback"></div>
+        <div class="quiz-nav"></div>
+        <div class="complete-banner"><span class="score"></span><span>correct! Section quiz complete.</span></div>
+      </div>
+      <div class="mark-complete-bar">
+        <button class="mark-complete-btn" data-section="pot-odds">✓ Mark Complete</button>
+        <span class="mark-complete-note">Saves your progress automatically</span>
+      </div>
+    </section>
+
+    <!-- ─── 5. POSITIONAL PLAY ─── -->
+    <section class="section-page" id="sec-positions">
+      <div class="section-header">
+        <div class="section-eyebrow">♠ Section 5 of 8</div>
+        <h1 class="section-title">Positional Play</h1>
+        <p class="section-intro">"Position is power." Acting after your opponents gives you an information advantage on every street. Learn to leverage it.</p>
+      </div>
+
+      <div class="info-box"><strong>The golden rule:</strong> Play more hands in late position. Play fewer, stronger hands in early position. Position is the single biggest factor in your profitability on any given hand.</div>
+
+      <h2 style="font-family:var(--font-display);font-size:1.2rem;color:var(--felt);margin:1.5rem 0 1rem">Click a position to learn more</h2>
+      <div class="position-grid">
+        <div class="pos-card" data-pos="utg"><div class="pos-abbr">UTG</div><div class="pos-name">Under the Gun</div></div>
+        <div class="pos-card" data-pos="mp"><div class="pos-abbr">MP</div><div class="pos-name">Middle Position</div></div>
+        <div class="pos-card" data-pos="co"><div class="pos-abbr">CO</div><div class="pos-name">Cutoff</div></div>
+        <div class="pos-card" data-pos="btn"><div class="pos-abbr">BTN</div><div class="pos-name">Button</div></div>
+        <div class="pos-card" data-pos="sb"><div class="pos-abbr">SB</div><div class="pos-name">Small Blind</div></div>
+        <div class="pos-card" data-pos="bb"><div class="pos-abbr">BB</div><div class="pos-name">Big Blind</div></div>
+      </div>
+
+      <div class="pos-detail" id="pos-utg">
+        <h3 style="font-family:var(--font-display);font-size:1.1rem;color:var(--felt);margin-bottom:0.75rem">UTG — Under the Gun</h3>
+        <p style="font-size:0.875rem;color:var(--text-muted);line-height:1.7">First to act pre-flop and most street post-flop (if players remain). UTG is the most disadvantaged position at the table. You have no information about what anyone else wants to do.</p>
+        <div class="tip-box" style="margin-top:1rem"><strong>Strategy tip:</strong> Open only premium hands from UTG: AA, KK, QQ, JJ, TT, AKs, AKo, AQs. Your range should be tight and strong, as you'll be out of position on most post-flop streets.</div>
+      </div>
+      <div class="pos-detail" id="pos-mp">
+        <h3 style="font-family:var(--font-display);font-size:1.1rem;color:var(--felt);margin-bottom:0.75rem">MP — Middle Position</h3>
+        <p style="font-size:0.875rem;color:var(--text-muted);line-height:1.7">Middle position players have slightly more info than UTG (fewer players acted before them) but are still largely out of position post-flop. A moderately tight range is appropriate here.</p>
+        <div class="tip-box" style="margin-top:1rem"><strong>Strategy tip:</strong> Add AJs, KQs, 99, 88 to your UTG range. You can start semi-bluffing suited connectors occasionally, but stay disciplined.</div>
+      </div>
+      <div class="pos-detail" id="pos-co">
+        <h3 style="font-family:var(--font-display);font-size:1.1rem;color:var(--felt);margin-bottom:0.75rem">CO — Cutoff</h3>
+        <p style="font-size:0.875rem;color:var(--text-muted);line-height:1.7">The Cutoff is second only to the Button. You're in position on everyone except the Button. Stealing the blinds from CO is extremely profitable, and you can open a wide range of hands.</p>
+        <div class="tip-box" style="margin-top:1rem"><strong>Strategy tip:</strong> Open around 25-30% of hands. Suited connectors, suited aces, and any pair become profitable here. Raise to steal frequently when the Button has been folding.</div>
+      </div>
+      <div class="pos-detail" id="pos-btn">
+        <h3 style="font-family:var(--font-display);font-size:1.1rem;color:var(--felt);margin-bottom:0.75rem">BTN — Button</h3>
+        <p style="font-size:0.875rem;color:var(--text-muted);line-height:1.7">The best seat in the house. The Button acts last post-flop on every street. This is where the most money is made in poker. You can play the widest range, apply maximum pressure, and make the most accurate decisions.</p>
+        <div class="tip-box" style="margin-top:1rem"><strong>Strategy tip:</strong> Open 40-50% of hands from the Button. Three-bet lighter. Float more. You have the maximum informational advantage — use it aggressively.</div>
+      </div>
+      <div class="pos-detail" id="pos-sb">
+        <h3 style="font-family:var(--font-display);font-size:1.1rem;color:var(--felt);margin-bottom:0.75rem">SB — Small Blind</h3>
+        <p style="font-size:0.875rem;color:var(--text-muted);line-height:1.7">The Small Blind is the worst post-flop position — you always act first. Despite paying in blind money, the SB is a significant long-term loser for most players. Avoid playing marginal hands from here.</p>
+        <div class="tip-box" style="margin-top:1rem"><strong>Strategy tip:</strong> Complete or raise with strong hands only. Avoid limping speculative hands. When you 3-bet, do so for value or as a bluff with blockers — not with medium-strength hands.</div>
+      </div>
+      <div class="pos-detail" id="pos-bb">
+        <h3 style="font-family:var(--font-display);font-size:1.1rem;color:var(--felt);margin-bottom:0.75rem">BB — Big Blind</h3>
+        <p style="font-size:0.875rem;color:var(--text-muted);line-height:1.7">The Big Blind has a unique advantage: you get a discount to see the flop. You've already invested one big blind, so your pot odds to call opens are better than anyone else. Defend your big blind aggressively.</p>
+        <div class="tip-box" style="margin-top:1rem"><strong>Strategy tip:</strong> Defend broadly vs single raises (call with ~40-50% of hands). You have the worst post-flop position, but your pot-odds discount compensates. Check-raise the flop frequently to protect your range.</div>
+      </div>
+
+      <div class="quiz-wrap" id="quiz-positions">
+        <div class="quiz-title">♠ Knowledge Check — Positional Play</div>
+        <div class="quiz-progress-dots"></div>
+        <div class="quiz-q"></div>
+        <div class="quiz-options"></div>
+        <div class="quiz-feedback"></div>
+        <div class="quiz-nav"></div>
+        <div class="complete-banner"><span class="score"></span><span>correct! Section quiz complete.</span></div>
+      </div>
+      <div class="mark-complete-bar">
+        <button class="mark-complete-btn" data-section="positions">✓ Mark Complete</button>
+        <span class="mark-complete-note">Saves your progress automatically</span>
+      </div>
+    </section>
+
+    <!-- ─── 6. BLUFFING & READS ─── -->
+    <section class="section-page" id="sec-bluffing">
+      <div class="section-header">
+        <div class="section-eyebrow">♥ Section 6 of 8</div>
+        <h1 class="section-title">Bluffing & Reads</h1>
+        <p class="section-intro">Bluffing is not about deception — it's about mathematics, board texture, and exploiting your opponent's tendencies.</p>
+      </div>
+
+      <div class="grid-2">
+        <div class="card card-sm">
+          <h3 style="font-size:1rem;font-weight:600;color:var(--felt);margin-bottom:0.5rem">Pure Bluff</h3>
+          <p style="font-size:0.85rem;color:var(--text-muted);line-height:1.6">You have little to no chance of winning at showdown. You bet solely to fold out better hands. High risk, needs high fold equity to be profitable.</p>
+          <div style="font-size:0.8rem;color:var(--red);margin-top:0.5rem;font-weight:500">Risk level: High</div>
+        </div>
+        <div class="card card-sm">
+          <h3 style="font-size:1rem;font-weight:600;color:var(--felt);margin-bottom:0.5rem">Semi-Bluff</h3>
+          <p style="font-size:0.85rem;color:var(--text-muted);line-height:1.6">You have a drawing hand that can become the best hand. Two ways to win: they fold now, OR you hit your draw. Lower risk, higher long-term EV.</p>
+          <div style="font-size:0.8rem;color:#2a7a2a;margin-top:0.5rem;font-weight:500">Risk level: Moderate — recommended</div>
+        </div>
+      </div>
+
+      <h2 style="font-family:var(--font-display);font-size:1.2rem;color:var(--felt);margin:1.5rem 0 1rem">When to Bluff</h2>
+      <div class="card">
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:0.75rem">
+          <li style="display:flex;gap:0.75rem;font-size:0.875rem"><span style="color:#2a7a2a;font-size:1rem">✓</span><div><strong style="color:var(--felt)">You have the best board:</strong> Scary boards with aces, high cards, or possible straights/flushes that hit your pre-flop raising range are prime bluffing territory.</div></li>
+          <li style="display:flex;gap:0.75rem;font-size:0.875rem"><span style="color:#2a7a2a;font-size:1rem">✓</span><div><strong style="color:var(--felt)">Opponent shows weakness:</strong> Check-call patterns or passive play indicates a medium-strength hand that can be pressured off the pot.</div></li>
+          <li style="display:flex;gap:0.75rem;font-size:0.875rem"><span style="color:#2a7a2a;font-size:1rem">✓</span><div><strong style="color:var(--felt)">You have position:</strong> Bluffing in position is far more effective — you see their action before committing chips.</div></li>
+          <li style="display:flex;gap:0.75rem;font-size:0.875rem"><span style="color:#2a7a2a;font-size:1rem">✓</span><div><strong style="color:var(--felt)">You have blockers:</strong> Holding a card that blocks your opponent's strong hands reduces the combinations they can have (e.g., holding an ace reduces the number of AA/AK combos they hold).</div></li>
+          <li style="display:flex;gap:0.75rem;font-size:0.875rem"><span style="color:var(--red);font-size:1rem">✗</span><div><strong style="color:var(--felt)">Don't bluff calling stations:</strong> If your opponent calls everything, bluffing is -EV. Value bet thin instead.</div></li>
+        </ul>
+      </div>
+
+      <h2 style="font-family:var(--font-display);font-size:1.2rem;color:var(--felt);margin:1.5rem 0 1rem">Reading Opponents</h2>
+      <div class="card">
+        <h3 style="font-size:0.9rem;font-weight:600;color:var(--felt);margin-bottom:0.75rem">Timing Tells</h3>
+        <div style="display:flex;flex-direction:column;gap:0.5rem">
+          <div style="display:grid;grid-template-columns:1fr 2fr;gap:1rem;font-size:0.85rem;padding:0.5rem 0;border-bottom:1px solid var(--border)">
+            <div style="font-weight:500;color:var(--felt)">Instant check</div><div style="color:var(--text-muted)">Usually weak — pre-programmed auto-check or giveup</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 2fr;gap:1rem;font-size:0.85rem;padding:0.5rem 0;border-bottom:1px solid var(--border)">
+            <div style="font-weight:500;color:var(--felt)">Instant call</div><div style="color:var(--text-muted)">Strong drawing hand — not ready to raise yet</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 2fr;gap:1rem;font-size:0.85rem;padding:0.5rem 0;border-bottom:1px solid var(--border)">
+            <div style="font-weight:500;color:var(--felt)">Long pause → bet</div><div style="color:var(--text-muted)">Often a strong hand faking weakness (acting)</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 2fr;gap:1rem;font-size:0.85rem;padding:0.5rem 0">
+            <div style="font-weight:500;color:var(--felt)">Long pause → check</div><div style="color:var(--text-muted)">Borderline decision — genuinely unsure, often medium strength</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:1rem">
+        <h3 style="font-size:0.9rem;font-weight:600;color:var(--felt);margin-bottom:0.75rem">Bet Sizing Reads</h3>
+        <div style="display:flex;flex-direction:column;gap:0.5rem">
+          <div style="display:grid;grid-template-columns:1fr 2fr;gap:1rem;font-size:0.85rem;padding:0.5rem 0;border-bottom:1px solid var(--border)">
+            <div style="font-weight:500;color:var(--felt)">Min-bet</div><div style="color:var(--text-muted)">Usually a weak blocking bet or recreational player with a big hand</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 2fr;gap:1rem;font-size:0.85rem;padding:0.5rem 0;border-bottom:1px solid var(--border)">
+            <div style="font-weight:500;color:var(--felt)">25-50% pot</div><div style="color:var(--text-muted)">Standard value bet or continuation bet — wide range</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 2fr;gap:1rem;font-size:0.85rem;padding:0.5rem 0;border-bottom:1px solid var(--border)">
+            <div style="font-weight:500;color:var(--felt)">75-100% pot</div><div style="color:var(--text-muted)">Strong value or big semi-bluff — polarized range</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 2fr;gap:1rem;font-size:0.85rem;padding:0.5rem 0">
+            <div style="font-weight:500;color:var(--felt)">Overbet (125%+)</div><div style="color:var(--text-muted)">Nutted hand or high-pressure bluff — very polarized</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="quiz-wrap" id="quiz-bluffing">
+        <div class="quiz-title">♥ Knowledge Check — Bluffing & Reads</div>
+        <div class="quiz-progress-dots"></div>
+        <div class="quiz-q"></div>
+        <div class="quiz-options"></div>
+        <div class="quiz-feedback"></div>
+        <div class="quiz-nav"></div>
+        <div class="complete-banner"><span class="score"></span><span>correct! Section quiz complete.</span></div>
+      </div>
+      <div class="mark-complete-bar">
+        <button class="mark-complete-btn" data-section="bluffing">✓ Mark Complete</button>
+        <span class="mark-complete-note">Saves your progress automatically</span>
+      </div>
+    </section>
+
+    <!-- ─── 7. BANKROLL MANAGEMENT ─── -->
+    <section class="section-page" id="sec-bankroll">
+      <div class="section-header">
+        <div class="section-eyebrow">♦ Section 7 of 8</div>
+        <h1 class="section-title">Bankroll Management</h1>
+        <p class="section-intro">The best player at the table can still go broke with poor bankroll management. Protect your money, play within your means.</p>
+      </div>
+
+      <div class="info-box"><strong>Why BRM matters:</strong> Poker has variance — even good players lose for extended stretches. Proper bankroll management ensures you can survive these downswings and stay in the game long enough for your edge to materialise.</div>
+
+      <h2 style="font-family:var(--font-display);font-size:1.2rem;color:var(--felt);margin:1.5rem 0 1rem">Recommended Buy-Ins by Format</h2>
+      <table class="stake-table">
+        <thead><tr><th>Format</th><th>Min Buy-ins</th><th>Recommended</th><th>Conservative</th></tr></thead>
+        <tbody>
+          <tr class="stake-row" data-buyin="20"><td>Cash Games (NL)</td><td>20</td><td>30</td><td>50</td><td><span class="ready-badge"></span></td></tr>
+          <tr class="stake-row" data-buyin="50"><td>MTT Tournaments</td><td>50</td><td>100</td><td>200</td><td><span class="ready-badge"></span></td></tr>
+          <tr class="stake-row" data-buyin="30"><td>Sit & Go (SNG)</td><td>30</td><td>50</td><td>100</td><td><span class="ready-badge"></span></td></tr>
+          <tr class="stake-row" data-buyin="100"><td>Live Cash (low)</td><td>20</td><td>30</td><td>50</td><td><span class="ready-badge"></span></td></tr>
+        </tbody>
+      </table>
+
+      <h2 style="font-family:var(--font-display);font-size:1.2rem;color:var(--felt);margin:1.5rem 0 1rem">Bankroll Calculator</h2>
+      <div class="br-calc">
+        <label>Your current bankroll ($)</label>
+        <input type="number" id="bankroll-input" placeholder="e.g. 500" min="0">
+        <p style="font-size:0.8rem;color:var(--text-muted)">Stakes highlighted in green are ones your bankroll supports (at 20× buy-in minimum).</p>
+      </div>
+
+      <h2 style="font-family:var(--font-display);font-size:1.2rem;color:var(--felt);margin:1.5rem 0 1rem">The Rules</h2>
+      <div class="card">
+        <ol style="list-style:decimal;margin-left:1.25rem;display:flex;flex-direction:column;gap:0.75rem">
+          <li style="font-size:0.875rem;color:var(--text-muted);line-height:1.6"><strong style="color:var(--felt)">Never play with money you can't afford to lose.</strong> Poker money should be a separate bankroll, not rent money.</li>
+          <li style="font-size:0.875rem;color:var(--text-muted);line-height:1.6"><strong style="color:var(--felt)">Have a stop-loss rule.</strong> If you lose 3 buy-ins in a session, stop. Come back tomorrow with a clear head.</li>
+          <li style="font-size:0.875rem;color:var(--text-muted);line-height:1.6"><strong style="color:var(--felt)">Move down without ego.</strong> If your bankroll drops below 15 buy-ins for your stake, drop to a lower level.</li>
+          <li style="font-size:0.875rem;color:var(--text-muted);line-height:1.6"><strong style="color:var(--felt)">Move up carefully.</strong> Only shot-take higher stakes when you have 5+ buy-ins for that level as a "shot fund" separate from your main roll.</li>
+          <li style="font-size:0.875rem;color:var(--text-muted);line-height:1.6"><strong style="color:var(--felt)">Track your results.</strong> Keep records of sessions (hours, stakes, profit/loss). You can't manage what you don't measure.</li>
+          <li style="font-size:0.875rem;color:var(--text-muted);line-height:1.6"><strong style="color:var(--felt)">Separate recreation from profit.</strong> Casual home games? Different money. If you're trying to win, treat it like a business.</li>
+        </ol>
+      </div>
+
+      <div class="quiz-wrap" id="quiz-bankroll">
+        <div class="quiz-title">♦ Knowledge Check — Bankroll Management</div>
+        <div class="quiz-progress-dots"></div>
+        <div class="quiz-q"></div>
+        <div class="quiz-options"></div>
+        <div class="quiz-feedback"></div>
+        <div class="quiz-nav"></div>
+        <div class="complete-banner"><span class="score"></span><span>correct! Section quiz complete.</span></div>
+      </div>
+      <div class="mark-complete-bar">
+        <button class="mark-complete-btn" data-section="bankroll">✓ Mark Complete</button>
+        <span class="mark-complete-note">Saves your progress automatically</span>
+      </div>
+    </section>
+
+    <!-- ─── 8. GLOSSARY ─── -->
+    <section class="section-page" id="sec-glossary">
+      <div class="section-header">
+        <div class="section-eyebrow">♣ Section 8 of 8</div>
+        <h1 class="section-title">Poker Glossary</h1>
+        <p class="section-intro">Every term you'll hear at the table. Search to find any definition instantly.</p>
+      </div>
+
+      <input type="text" class="glossary-search" id="glossary-search" placeholder="🔍 Search terms... e.g. 'bluff', 'pot', 'flop'">
+
+      <div class="glossary-letter">A</div>
+      <dl>
+        <div class="glossary-term"><dt>Action</dt><dd>Any bet, call, raise, or fold. Also refers to a game with a lot of betting and raising.</dd></div>
+        <div class="glossary-term"><dt>All-in</dt><dd>Betting all remaining chips. A player cannot be forced out of a hand for lack of chips — they play for a side pot.</dd></div>
+        <div class="glossary-term"><dt>Ante</dt><dd>A forced bet that all players post before each hand, used to increase pot size and encourage action.</dd></div>
+      </dl>
+
+      <div class="glossary-letter">B</div>
+      <dl>
+        <div class="glossary-term"><dt>Bad Beat</dt><dd>Losing a hand despite being a strong statistical favourite — e.g. AA vs KK pre-flop, and KK wins.</dd></div>
+        <div class="glossary-term"><dt>Backdoor</dt><dd>Making a flush or straight using both the turn and river cards (also called "runner-runner").</dd></div>
+        <div class="glossary-term"><dt>Big Blind (BB)</dt><dd>The forced bet posted by the player two seats left of the dealer button. Sets the minimum bet size.</dd></div>
+        <div class="glossary-term"><dt>Blank</dt><dd>A card that doesn't meaningfully change the board or any player's hand strength.</dd></div>
+        <div class="glossary-term"><dt>Blocker</dt><dd>Holding a card that reduces the combinations of strong hands your opponent can have.</dd></div>
+        <div class="glossary-term"><dt>Board</dt><dd>The five community cards dealt face-up in Hold'em (flop, turn, river).</dd></div>
+        <div class="glossary-term"><dt>Button (BTN)</dt><dd>The dealer position — the best post-flop seat because it acts last on every street.</dd></div>
+      </dl>
+
+      <div class="glossary-letter">C</div>
+      <dl>
+        <div class="glossary-term"><dt>Check</dt><dd>Declining to bet while retaining the right to call or raise later. Only available when no bet has been made.</dd></div>
+        <div class="glossary-term"><dt>Check-Raise</dt><dd>Checking, then raising after an opponent bets. A powerful aggressive move to build the pot or as a bluff.</dd></div>
+        <div class="glossary-term"><dt>Continuation Bet (c-bet)</dt><dd>A bet made on the flop by the player who was the last pre-flop aggressor, regardless of how the flop hit them.</dd></div>
+        <div class="glossary-term"><dt>Cooler</dt><dd>A hand where both players have very strong holdings — e.g. AA vs KK. Hard to avoid losing big.</dd></div>
+        <div class="glossary-term"><dt>Cutoff (CO)</dt><dd>The position immediately to the right of the Button. Second-best position at the table.</dd></div>
+      </dl>
+
+      <div class="glossary-letter">D</div>
+      <dl>
+        <div class="glossary-term"><dt>Dead Money</dt><dd>Chips in the pot contributed by players who have already folded. Valuable to contest for.</dd></div>
+        <div class="glossary-term"><dt>Donk Bet</dt><dd>A bet made out of position into the pre-flop aggressor. Considered non-standard in most spots.</dd></div>
+        <div class="glossary-term"><dt>Double Up</dt><dd>Going all-in and winning, thereby doubling your chip stack.</dd></div>
+        <div class="glossary-term"><dt>Draw</dt><dd>A hand that is not yet complete but needs additional cards to become strong — e.g. four cards to a flush.</dd></div>
+      </dl>
+
+      <div class="glossary-letter">E</div>
+      <dl>
+        <div class="glossary-term"><dt>Equity</dt><dd>Your percentage share of the pot based on your probability of winning at showdown given current cards.</dd></div>
+        <div class="glossary-term"><dt>Expected Value (EV)</dt><dd>The average profit or loss of a decision over many repetitions. +EV means profitable long-term.</dd></div>
+      </dl>
+
+      <div class="glossary-letter">F</div>
+      <dl>
+        <div class="glossary-term"><dt>Fish</dt><dd>A weak, inexperienced player. Also called a "donkey" or "calling station."</dd></div>
+        <div class="glossary-term"><dt>Flop</dt><dd>The first three community cards dealt face-up after the first betting round.</dd></div>
+        <div class="glossary-term"><dt>Fold Equity</dt><dd>The value gained from opponents folding to your bet. A key component of bluff profitability.</dd></div>
+        <div class="glossary-term"><dt>Freeroll</dt><dd>A tournament with no entry fee. Also: when you can't lose but might win — e.g. a split pot situation where you have outs to scoop.</dd></div>
+      </dl>
+
+      <div class="glossary-letter">G</div>
+      <dl>
+        <div class="glossary-term"><dt>GTO</dt><dd>Game Theory Optimal. A mathematically balanced strategy that is unexploitable by opponents.</dd></div>
+        <div class="glossary-term"><dt>Gutshot</dt><dd>An inside straight draw needing one specific rank to complete — e.g. holding 5-6 with 8-9-2 on the board needing a 7. Only 4 outs.</dd></div>
+      </dl>
+
+      <div class="glossary-letter">H</div>
+      <dl>
+        <div class="glossary-term"><dt>Heads-Up (HU)</dt><dd>A hand or game involving exactly two players.</dd></div>
+        <div class="glossary-term"><dt>Hero Call</dt><dd>Calling a large bet with a relatively weak hand based on a read that your opponent is bluffing.</dd></div>
+        <div class="glossary-term"><dt>Hole Cards</dt><dd>The two private cards dealt face-down to each player at the start of a hand.</dd></div>
+      </dl>
+
+      <div class="glossary-letter">I</div>
+      <dl>
+        <div class="glossary-term"><dt>Implied Odds</dt><dd>The potential future winnings factored into a call decision. If you hit your draw, you expect to win more chips on future streets.</dd></div>
+        <div class="glossary-term"><dt>In Position (IP)</dt><dd>Acting after your opponent on a given street — a significant strategic advantage.</dd></div>
+      </dl>
+
+      <div class="glossary-letter">K</div>
+      <dl>
+        <div class="glossary-term"><dt>Kicker</dt><dd>An unpaired card that is used to break ties between hands of the same rank — e.g. AK beats AQ when both pair the ace.</dd></div>
+      </dl>
+
+      <div class="glossary-letter">L</div>
+      <dl>
+        <div class="glossary-term"><dt>LAG</dt><dd>Loose Aggressive. A player who enters many pots and bets/raises aggressively. High skill ceiling.</dd></div>
+        <div class="glossary-term"><dt>Limp</dt><dd>Calling the big blind pre-flop rather than raising. Generally considered weak play in most positions.</dd></div>
+      </dl>
+
+      <div class="glossary-letter">M</div>
+      <dl>
+        <div class="glossary-term"><dt>Muck</dt><dd>To discard your hand face-down without showing it. You can muck a losing hand at showdown.</dd></div>
+        <div class="glossary-term"><dt>MTT</dt><dd>Multi-Table Tournament. A tournament with multiple tables that gradually consolidate as players are eliminated.</dd></div>
+      </dl>
+
+      <div class="glossary-letter">N</div>
+      <dl>
+        <div class="glossary-term"><dt>Nit</dt><dd>An extremely tight, passive player who only plays the very best hands and rarely bluffs.</dd></div>
+        <div class="glossary-term"><dt>Nuts</dt><dd>The absolute best possible hand given the current board. "I had the nuts" = unbeatable hand.</dd></div>
+      </dl>
+
+      <div class="glossary-letter">O</div>
+      <dl>
+        <div class="glossary-term"><dt>Outs</dt><dd>Cards remaining in the deck that will improve your hand to (likely) the best hand.</dd></div>
+        <div class="glossary-term"><dt>Overbet</dt><dd>A bet larger than the size of the pot, used to maximize pressure with the nuts or as a high-pressure bluff.</dd></div>
+        <div class="glossary-term"><dt>Overpair</dt><dd>A pocket pair higher than any card on the board — e.g. KK on a Q-7-3 board.</dd></div>
+      </dl>
+
+      <div class="glossary-letter">P</div>
+      <dl>
+        <div class="glossary-term"><dt>Polarized</dt><dd>A betting range consisting of only very strong hands (nuts) or complete bluffs — nothing in between.</dd></div>
+        <div class="glossary-term"><dt>Pot Odds</dt><dd>The ratio of the pot size to the cost of a call, expressed as a percentage. Used to evaluate call profitability.</dd></div>
+        <div class="glossary-term"><dt>Probe Bet</dt><dd>A small bet made out of position when the in-position player checks back the flop, to gain information.</dd></div>
+      </dl>
+
+      <div class="glossary-letter">R</div>
+      <dl>
+        <div class="glossary-term"><dt>Rake</dt><dd>The commission fee taken by the casino or poker room from each pot, typically 2-5%.</dd></div>
+        <div class="glossary-term"><dt>Range</dt><dd>The complete set of hands a player could plausibly have in a given situation based on their actions.</dd></div>
+        <div class="glossary-term"><dt>River</dt><dd>The fifth and final community card dealt in Hold'em. The last opportunity to bet.</dd></div>
+        <div class="glossary-term"><dt>Runner-Runner</dt><dd>Hitting the turn and river to complete a drawing hand — also called backdoor.</dd></div>
+      </dl>
+
+      <div class="glossary-letter">S</div>
+      <dl>
+        <div class="glossary-term"><dt>Semi-Bluff</dt><dd>Betting or raising with a drawing hand that can win if called (by completing) or if opponents fold.</dd></div>
+        <div class="glossary-term"><dt>Set</dt><dd>Three of a kind made with a pocket pair + one card on the board. Disguised and very powerful.</dd></div>
+        <div class="glossary-term"><dt>Showdown</dt><dd>Revealing hole cards at the end of a hand to determine the winner when two or more players remain.</dd></div>
+        <div class="glossary-term"><dt>Small Blind (SB)</dt><dd>The forced bet posted by the player immediately left of the dealer button — half the big blind.</dd></div>
+        <div class="glossary-term"><dt>Squeeze</dt><dd>A 3-bet made after one player has opened and one or more players have called, targeting the callers' wide ranges.</dd></div>
+      </dl>
+
+      <div class="glossary-letter">T</div>
+      <dl>
+        <div class="glossary-term"><dt>TAG</dt><dd>Tight Aggressive. Plays few hands but bets and raises aggressively with strong holdings.</dd></div>
+        <div class="glossary-term"><dt>Tell</dt><dd>A physical or behavioural pattern that reveals information about a player's hand strength.</dd></div>
+        <div class="glossary-term"><dt>Tilt</dt><dd>Playing emotionally rather than logically, often after a bad beat. One of the biggest leaks in poker.</dd></div>
+        <div class="glossary-term"><dt>Turn</dt><dd>The fourth community card dealt in Hold'em, after the flop betting round.</dd></div>
+      </dl>
+
+      <div class="glossary-letter">U</div>
+      <dl>
+        <div class="glossary-term"><dt>Under the Gun (UTG)</dt><dd>The player who acts first pre-flop — the most disadvantaged position at the table.</dd></div>
+      </dl>
+
+      <div class="glossary-letter">V</div>
+      <dl>
+        <div class="glossary-term"><dt>Value Bet</dt><dd>A bet made with a strong hand, hoping to be called by weaker hands to extract maximum chips.</dd></div>
+        <div class="glossary-term"><dt>Variance</dt><dd>The natural statistical swings in poker results. Even great players can lose for weeks — variance is unavoidable.</dd></div>
+      </dl>
+
+      <div class="glossary-letter">W</div>
+      <dl>
+        <div class="glossary-term"><dt>Whale</dt><dd>A recreational player with a large bankroll who plays loosely. Very profitable to have at your table.</dd></div>
+        <div class="glossary-term"><dt>Wet Board</dt><dd>A board texture with many possible draws — e.g. J♥-T♥-9♣. Many hands connect with wet boards.</dd></div>
+      </dl>
+
+      <div class="quiz-wrap" id="quiz-glossary">
+        <div class="quiz-title">♣ Knowledge Check — Glossary Terms</div>
+        <div class="quiz-progress-dots"></div>
+        <div class="quiz-q"></div>
+        <div class="quiz-options"></div>
+        <div class="quiz-feedback"></div>
+        <div class="quiz-nav"></div>
+        <div class="complete-banner"><span class="score"></span><span>correct! Section quiz complete.</span></div>
+      </div>
+      <div class="mark-complete-bar">
+        <button class="mark-complete-btn" data-section="glossary">✓ Mark Complete</button>
+        <span class="mark-complete-note">Saves your progress automatically</span>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script src="scripts/main.js"></script>
+</body>
+</html>
