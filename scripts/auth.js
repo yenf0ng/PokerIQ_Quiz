@@ -7,11 +7,13 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
   getAuth, signInWithPopup, signOut,
-  GoogleAuthProvider, onAuthStateChanged
+  GoogleAuthProvider, onAuthStateChanged, updateProfile
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
   getFirestore, doc, getDoc, setDoc, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+
 
 // ── Read config injected by inject-config.js ──
 const firebaseConfig = window.FIREBASE_CONFIG || {};
@@ -437,6 +439,15 @@ function drawSeal(ctx, cx, cy) {
 }
 
 window.downloadCertificate = function() {
+  // 1. Check eligibility before downloading
+  const p = getLocalProgress();
+  const done = ALL_SECTIONS.filter(s => p[s]).length;
+  
+  if (done < ALL_SECTIONS.length) {
+    alert(`🔒 Certificate Locked! You have only completed ${done}/8 sections. Complete all lessons and quizzes to download.`);
+    return; // Stops execution immediately
+  }
+
   const canvas = document.getElementById('cert-canvas');
   if (!canvas) return;
   const name = (document.getElementById('cert-name-input')?.value || 'PokerIQ_Certificate')
@@ -457,3 +468,41 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCertModal(); });
   checkCertEligibility();
 });
+
+// Expose global profile save operation
+window.updateUserProfileData = async function(newName, newPhotoURL, newCountry) {
+  if (!currentUser || !firebaseReady) {
+    alert("You must be signed in to update your profile.");
+    return;
+  }
+
+  try {
+    // 1. Update identity metadata in Firebase Auth
+    await updateProfile(auth.currentUser, {
+      displayName: newName,
+      photoURL: newPhotoURL
+    });
+
+    // 2. Persist Country setting locally
+    localStorage.setItem('pokeriq_country', newCountry);
+
+    // 3. Save directly to user record in Firestore
+    const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+    await setDoc(doc(db, 'users', currentUser.uid), {
+      displayName: newName,
+      photoURL: newPhotoURL,
+      country: newCountry
+    }, { merge: true });
+
+    // 4. Update the Leaderboard sync 
+    if (typeof window.pushLeaderboardScore === 'function') {
+      window.pushLeaderboardScore(db, currentUser.uid, auth.currentUser);
+    }
+
+    alert("Profile updated successfully!");
+    location.reload(); // Reload to refresh interface states smoothly
+  } catch (error) {
+    console.error("Profile update failed:", error);
+    alert("Error updating profile: " + error.message);
+  }
+};

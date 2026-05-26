@@ -48,9 +48,9 @@ function closeSidebar() {
   document.querySelector('.overlay')?.classList.remove('open');
 }
 
-// ── Card Utilities ──
-const RANKS = ['A','K','Q','J','T','9','8','7','6','5','4','3','2'];
-const SUITS = [['♠','black'],['♥','red'],['♦','red'],['♣','black']];
+// ── Card Utilities (Renamed to avoid collision with game.js) ──
+const CALC_RANKS = ['A','K','Q','J','T','9','8','7','6','5','4','3','2'];
+const CALC_SUITS = [['♠','black'],['♥','red'],['♦','red'],['♣','black']];
 const SUIT_NAMES = {'♠':'spades','♥':'hearts','♦':'diamonds','♣':'clubs'};
 
 function makeCardEl(rank, suit, color) {
@@ -97,13 +97,13 @@ function openCardModal(slotId, slotEl) {
   const modal = document.getElementById('card-modal');
   const grid = document.getElementById('modal-cards');
   grid.innerHTML = '';
-  SUITS.forEach(([suit, color]) => {
+  CALC_SUITS.forEach(([suit, color]) => {
     const sec = document.createElement('div');
     sec.className = 'suit-section';
     sec.innerHTML = `<div class="suit-label" style="color:${color==='red'?'var(--red)':'var(--text)'}">${suit} ${SUIT_NAMES[suit]}</div><div class="rank-buttons" id="rb-${suit}"></div>`;
     grid.appendChild(sec);
     const rb = sec.querySelector('.rank-buttons');
-    RANKS.forEach(rank => {
+    CALC_RANKS.forEach(rank => {
       const key = rank + suit;
       const btn = document.createElement('button');
       btn.className = 'rank-btn' + (color === 'red' ? ' red-suit' : '') + (pickedCards[key] ? ' used' : '');
@@ -193,9 +193,9 @@ function estimateOuts(hole, board) {
 }
 
 // Deck utilities
-function buildDeck() {
+function internalBuildDeck() {
   const d = [];
-  SUITS.forEach(([s]) => RANKS.forEach(r => d.push(r+s)));
+  CALC_SUITS.forEach(([s]) => CALC_RANKS.forEach(r => d.push(r+s)));
   return d;
 }
 
@@ -231,7 +231,7 @@ function bestOf7(cards) {
 }
 
 function monteCarloEquity(hole, board, sims) {
-  const deck = buildDeck().filter(c=>![...hole,...board].includes(c));
+  const deck = internalBuildDeck().filter(c=>![...hole,...board].includes(c));
   let win=0,tie=0,lose=0;
   const needed = 5 - board.length;
   for (let i=0;i<sims;i++) {
@@ -356,36 +356,6 @@ const quizData = {
     { q: 'With 9 outs on the flop, what is the approximate chance of hitting by the river?', opts: ['18%','35%','50%','65%'], ans: 1, exp: 'With 9 outs on the flop: roughly 9×4 = 36%, so about 35% is correct.' },
     { q: 'The "Rule of 4 and 2" is used to:', opts: ['Count cards','Estimate equity with outs','Calculate rake','Determine pot odds'], ans: 1, exp: 'Rule of 4 and 2: multiply outs by 4 on the flop (two cards to come) or by 2 on the turn.' },
     { q: 'A flush draw typically has how many outs?', opts: ['7','9','11','13'], ans: 1, exp: 'A flush draw has 9 outs — 13 cards per suit minus the 4 you already hold.' },
-  ],
-  'pot-odds': [
-    { q: 'If the pot is $100 and your opponent bets $50, what are your pot odds?', opts: ['25%','33%','50%','66%'], ans: 1, exp: 'Pot is now $150, you call $50. Pot odds = 50/150 = 33%.' },
-    { q: 'You need 35% equity to call. Your pot odds are 30%. Should you call?', opts: ['Yes, always call','No, fold','Only if you have position','Depends on stack size'], ans: 1, exp: 'If your equity (35%) is greater than your pot odds (30%), you call. Here equity > pot odds, so actually you SHOULD call. Trick question!' },
-    { q: 'What does "equity" mean in poker?', opts: ['The amount in the pot','Your % chance of winning','The value of your stack','Your rakeback'], ans: 1, exp: 'Equity is your percentage chance of winning the hand at any given moment.' },
-    { q: 'Which is more important than raw pot odds?', opts: ['Card suits','Table position','Implied odds','Stack color'], ans: 2, exp: 'Implied odds account for future betting rounds, often making calls more profitable than pot odds alone suggest.' },
-  ],
-  'positions': [
-    { q: 'Which position acts LAST post-flop?', opts: ['UTG','Small Blind','Big Blind','Button (BTN)'], ans: 3, exp: 'The Button is the best position — you act last on every post-flop street.' },
-    { q: 'What does UTG stand for?', opts: ['Under The Gun','Up The Grade','Usually The Grinder','Under The Goal'], ans: 0, exp: 'UTG (Under The Gun) is the first player to act pre-flop — a disadvantaged position.' },
-    { q: 'Why is position so important in poker?', opts: ['You can see more cards','You act after opponents, gaining information','You pay less rake','You get dealt better hands'], ans: 1, exp: 'Acting after opponents lets you see their actions before deciding — a massive informational advantage.' },
-    { q: 'In a 6-player game, which position is to the right of the Button?', opts: ['UTG','Big Blind','Cutoff (CO)','Small Blind'], ans: 2, exp: 'The Cutoff (CO) is directly to the right of the Button and is the second-best position.' },
-  ],
-  'bluffing': [
-    { q: 'A "semi-bluff" is:', opts: ['A bluff with no chance of winning','Bluffing with a drawing hand','Bluffing with the nuts','A small value bet'], ans: 1, exp: 'A semi-bluff has two ways to win: opponents fold now, OR you hit your draw.' },
-    { q: 'What is a "timing tell"?', opts: ['Watching the clock','A pattern in how long a player takes to act','A physical gesture','The time of day you play'], ans: 1, exp: 'Timing tells — hesitations, instant calls, or fast raises — often reveal information about hand strength.' },
-    { q: 'Which bet sizing is most commonly associated with a bluff?', opts: ['Minimum bet','50% pot','100%+ pot (overbet)','Limping'], ans: 2, exp: 'Overbets as bluffs maximize fold equity. They put maximum pressure on opponents.' },
-    { q: '"Polarized" bluffing range means:', opts: ['Bluffing with medium-strength hands','Bluffing only with very strong OR very weak hands','Bluffing every street','Never bluffing'], ans: 1, exp: 'A polarized range contains nutted hands and bluffs — not medium-strength hands.' },
-  ],
-  'bankroll': [
-    { q: 'The standard bankroll recommendation for cash games is:', opts: ['5 buy-ins','10 buy-ins','20 buy-ins','50 buy-ins'], ans: 2, exp: '20 buy-ins is the minimum recommended for cash games to withstand variance.' },
-    { q: 'What should you do if you lose 5 buy-ins in a session?', opts: ['Play higher stakes','Play longer to recover','Move down in stakes','Keep playing the same stakes'], ans: 2, exp: 'Moving down protects your bankroll. Never chase losses by moving up in stakes.' },
-    { q: 'What percentage of your bankroll should you risk in a single tournament?', opts: ['1-2%','10%','25%','50%'], ans: 0, exp: 'Risk no more than 1-2% per tournament entry to withstand the high variance of tournament poker.' },
-    { q: 'What is "shot-taking" in poker bankroll management?', opts: ['Drinking during play','Taking a shot at higher stakes with extra funds','Bluffing more','Playing fewer hands'], ans: 1, exp: 'Shot-taking means playing one or a few sessions at a higher stake when your bankroll allows, with a plan to move back down if unsuccessful.' },
-  ],
-  'glossary': [
-    { q: 'What does "c-bet" mean?', opts: ['Check-Bet','Continuation Bet','Cash Bet','Call-Back Bet'], ans: 1, exp: 'A continuation bet (c-bet) is when the pre-flop aggressor bets again on the flop.' },
-    { q: 'What is "the nuts"?', opts: ['A bad hand','An average hand','The best possible hand','A pocket pair'], ans: 2, exp: '"The nuts" refers to the absolute best possible hand given the board.' },
-    { q: 'What does "donk bet" mean?', opts: ['A large bet','A bet made into the pre-flop aggressor, out of position','A minimum bet','A bluff on the river'], ans: 1, exp: 'A donk bet is made by the out-of-position player into the pre-flop raiser — considered non-standard.' },
-    { q: 'What is "rake"?', opts: ['A bluffing move','The small percentage the house takes from each pot','A type of hand','The dealer button'], ans: 1, exp: 'Rake is the commission fee taken by the card room from each pot (typically 2-5%).' },
   ]
 };
 
@@ -463,10 +433,10 @@ const HAND_TYPES = ['High Card','One Pair','Two Pair','Three of a Kind','Straigh
 let testerCards = [];
 function initHandTester() {
   dealTesterHand();
-  document.getElementById('tester-deal').addEventListener('click', dealTesterHand);
+  document.getElementById('tester-deal')?.addEventListener('click', dealTesterHand);
 }
 function dealTesterHand() {
-  const deck = buildDeck();
+  const deck = internalBuildDeck();
   shuffle(deck);
   testerCards = deck.slice(0,5);
   const container = document.getElementById('tester-cards');
@@ -480,38 +450,6 @@ function dealTesterHand() {
   document.querySelectorAll('.guess-btn').forEach(b => { b.classList.remove('correct','wrong'); b.disabled = false; });
   const resultEl = document.getElementById('tester-result');
   if (resultEl) resultEl.classList.remove('show');
-}
-function guessHand(idx) {
-  const score = handScore(testerCards);
-  const correct = idx === score;
-  document.querySelectorAll('.guess-btn').forEach((b, i) => {
-    b.disabled = true;
-    if (i === score) b.classList.add('correct');
-    else if (i === idx && !correct) b.classList.add('wrong');
-  });
-  const resultEl = document.getElementById('tester-result');
-  if (resultEl) {
-    resultEl.classList.add('show');
-    resultEl.innerHTML = `<div class="tester-result-name">${correct ? '✓ Correct! ' : '✗ Wrong — it\'s a '} ${HAND_TYPES[score]}</div>
-    <div style="font-size:0.85rem;color:rgba(255,255,255,0.7);margin-top:0.4rem">${getHandExplanation(testerCards, score)}</div>`;
-  }
-}
-function getHandExplanation(cards, score) {
-  const rs = cards.map(c=>c.slice(0,-1));
-  const counts = {}; rs.forEach(r=>counts[r]=(counts[r]||0)+1);
-  const pairs = Object.entries(counts).filter(([,v])=>v===2).map(([k])=>k);
-  const trips = Object.entries(counts).filter(([,v])=>v===3).map(([k])=>k);
-  const quads = Object.entries(counts).filter(([,v])=>v===4).map(([k])=>k);
-  if (score===1 && pairs.length) return `You have a pair of ${pairs[0]}s.`;
-  if (score===2) return `Two pair: ${pairs.join(' and ')}.`;
-  if (score===3) return `Three ${trips[0]}s.`;
-  if (score===7) return `Four ${quads[0]}s — very rare!`;
-  if (score===5) return 'All five cards share the same suit.';
-  if (score===4) return 'Five consecutive ranks.';
-  if (score===6) return `Full house: ${trips[0]}s full of ${pairs[0]}s.`;
-  if (score===8) return 'Five consecutive cards of the same suit!';
-  if (score===9) return 'The best hand possible — A-K-Q-J-T all of the same suit!';
-  return 'Five unconnected cards of different suits.';
 }
 
 // ── Init ──
@@ -543,4 +481,20 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelector('.overlay').classList.toggle('open');
   });
   document.querySelector('.overlay')?.addEventListener('click', closeSidebar);
+
+  // ── Profile Modification Listener ──
+  document.getElementById('save-profile-changes')?.addEventListener('click', () => {
+    const name = document.getElementById('profile-name-input').value;
+    const avatar = document.getElementById('profile-avatar-input').value;
+    const country = document.getElementById('profile-country-select').value;
+    
+    if (typeof window.updateUserProfileData === 'function') {
+      window.updateUserProfileData(name, avatar, country);
+    } else {
+      // Fallback if running entirely without Firebase initialization config
+      localStorage.setItem('pokeriq_country', country);
+      alert("Saved details locally (Firebase unconfigured).");
+      document.getElementById('profile-modal').classList.remove('open');
+    }
+  });
 });

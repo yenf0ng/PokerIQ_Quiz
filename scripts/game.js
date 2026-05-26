@@ -4,9 +4,9 @@
 //  No real money — credits only
 // ══════════════════════════════════════════════
 
-const RANKS = ['2','3','4','5','6','7','8','9','T','J','Q','K','A'];
-const SUITS = ['♠','♥','♦','♣'];
-const RANK_VAL = Object.fromEntries(RANKS.map((r,i)=>[r,i]));
+const GAME_RANKS = ['2','3','4','5','6','7','8','9','T','J','Q','K','A'];
+const GAME_SUITS = ['♠','♥','♦','♣'];
+const RANK_VAL = Object.fromEntries(GAME_RANKS.map((r,i)=>[r,i]));
 
 // ── Deck ───────────────────────────────────────
 function buildDeck() {
