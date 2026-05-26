@@ -1,7 +1,7 @@
 // ══════════════════════════════════════════════
 //  PokerIQ — Firebase Auth + Firestore + Certificate
-//  Config is loaded from scripts/firebase-config.js
-//  (that file is in .gitignore — never pushed to GitHub)
+//  Config injected at build time via inject-config.js
+//  Environment variables set in Netlify dashboard
 // ══════════════════════════════════════════════
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -13,38 +13,33 @@ import {
   getFirestore, doc, getDoc, setDoc, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// ── Read config from firebase-config.js ───────
-// If config is missing, show a helpful warning
-if (!window.FIREBASE_CONFIG || window.FIREBASE_CONFIG.apiKey.includes('PASTE_')) {
-  console.warn(
-    '%c PokerIQ: Firebase not configured ',
-    'background:#c9a84c;color:#1a2e1a;font-weight:bold;padding:4px 8px;border-radius:4px',
-    '\n\n1. Copy scripts/firebase-config.template.js → scripts/firebase-config.js' +
-    '\n2. Fill in your Firebase project values' +
-    '\n3. Refresh the page\n'
-  );
-}
-
+// ── Read config injected by inject-config.js ──
 const firebaseConfig = window.FIREBASE_CONFIG || {};
 const CERT = window.CERT_CONFIG || {
   issuer:    'PokerIQ Academy',
   course:    "Texas Hold'em Mastery",
   signature: 'PokerIQ',
-  website:   'pokeriq.github.io'
+  website:   'pokeriq.netlify.app'
 };
+
+// Check if Firebase is properly configured
+const isConfigured = firebaseConfig.apiKey && firebaseConfig.apiKey.length > 10;
 
 let app, auth, db, provider, currentUser = null;
 let firebaseReady = false;
 
-try {
-  app      = initializeApp(firebaseConfig);
-  auth     = getAuth(app);
-  db       = getFirestore(app);
-  provider = new GoogleAuthProvider();
-  firebaseReady = true;
-} catch(e) {
-  console.warn('Firebase init failed — running in offline mode:', e.message);
-  renderAuthBar(null);
+if (isConfigured) {
+  try {
+    app      = initializeApp(firebaseConfig);
+    auth     = getAuth(app);
+    db       = getFirestore(app);
+    provider = new GoogleAuthProvider();
+    firebaseReady = true;
+  } catch(e) {
+    console.warn('Firebase init failed:', e.message);
+  }
+} else {
+  console.info('PokerIQ: Firebase not configured — running without auth. Sign-in disabled.');
 }
 
 // ── Auth state listener ────────────────────────
@@ -58,6 +53,9 @@ if (firebaseReady) {
     }
     checkCertEligibility();
   });
+} else {
+  renderAuthBar(null);
+  checkCertEligibility();
 }
 
 // ── Render auth bar ────────────────────────────
@@ -74,14 +72,16 @@ function renderAuthBar(user) {
       <button class="auth-btn" id="signout-btn">Sign out</button>
     `;
     document.getElementById('signout-btn')?.addEventListener('click', handleSignOut);
-  } else {
-    bar.innerHTML = firebaseReady ? `
+  } else if (firebaseReady) {
+    bar.innerHTML = `
       <button class="auth-btn signin" id="signin-btn">
         <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="" style="width:16px;height:16px">
         Sign in with Google
       </button>
-    ` : `<span style="font-size:0.75rem;color:rgba(255,255,255,0.4)">Firebase not configured</span>`;
+    `;
     document.getElementById('signin-btn')?.addEventListener('click', handleSignIn);
+  } else {
+    bar.innerHTML = `<span style="font-size:0.75rem;color:rgba(255,255,255,0.35)">Auth unavailable</span>`;
   }
 }
 
@@ -92,9 +92,12 @@ async function handleSignIn() {
   try {
     await signInWithPopup(auth, provider);
   } catch(e) {
-    if (btn) { btn.innerHTML = '<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="" style="width:16px;height:16px"> Sign in with Google'; btn.disabled = false; }
+    if (btn) {
+      btn.innerHTML = '<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="" style="width:16px;height:16px"> Sign in with Google';
+      btn.disabled = false;
+    }
     if (e.code === 'auth/unauthorized-domain') {
-      alert('Domain not authorised.\n\nFix: Firebase Console → Authentication → Settings → Authorised domains → Add your GitHub Pages domain.');
+      alert('Domain not authorised.\n\nFix: Firebase Console → Authentication → Settings → Authorised domains → add your Netlify domain.');
     } else if (e.code !== 'auth/popup-closed-by-user') {
       alert('Sign-in failed: ' + e.message);
     }
@@ -108,15 +111,13 @@ async function handleSignOut() {
   checkCertEligibility();
 }
 
-// ── Firestore: pull progress from cloud ────────
+// ── Firestore: pull ────────────────────────────
 async function syncProgressFromFirestore(uid) {
   try {
     const ref  = doc(db, 'users', uid);
     const snap = await getDoc(ref);
     if (snap.exists()) {
-      const data   = snap.data();
-      const local  = getLocalProgress();
-      const merged = { ...local, ...(data.progress || {}) };
+      const merged = { ...getLocalProgress(), ...(snap.data().progress || {}) };
       saveLocalProgress(merged);
       if (typeof updateProgressUI === 'function') updateProgressUI();
     } else {
@@ -129,11 +130,10 @@ async function syncProgressFromFirestore(uid) {
   }
 }
 
-// ── Firestore: push progress to cloud ──────────
+// ── Firestore: push ────────────────────────────
 async function pushProgressToFirestore(uid) {
   try {
-    const ref = doc(db, 'users', uid);
-    await setDoc(ref, {
+    await setDoc(doc(db, 'users', uid), {
       progress:    getLocalProgress(),
       displayName: currentUser?.displayName || '',
       email:       currentUser?.email || '',
@@ -146,7 +146,7 @@ async function pushProgressToFirestore(uid) {
   }
 }
 
-// ── Called by main.js after each section done ──
+// ── Called by main.js after section complete ───
 window.onSectionMarkedComplete = async (sectionId) => {
   if (currentUser && firebaseReady) {
     await pushProgressToFirestore(currentUser.uid);
@@ -159,7 +159,7 @@ function setSyncDot(online) {
   const dot = document.getElementById('sync-dot');
   if (dot) {
     dot.classList.toggle('offline', !online);
-    dot.title = online ? 'Progress synced to cloud ✓' : 'Offline — progress saved locally';
+    dot.title = online ? 'Progress synced ✓' : 'Offline — saved locally';
   }
 }
 
@@ -173,7 +173,7 @@ function saveLocalProgress(p) {
   catch(e) {}
 }
 
-// ── Certificate eligibility check ─────────────
+// ── Certificate eligibility ────────────────────
 const ALL_SECTIONS = [
   'hand-rankings','playstyle','odds-calc','pot-odds',
   'positions','bluffing','bankroll','glossary'
@@ -196,7 +196,7 @@ function checkCertEligibility() {
   renderDashboard(done, pct);
 }
 
-// ── Progress dashboard (shows when signed in) ──
+// ── Progress dashboard ─────────────────────────
 function renderDashboard(done, pct) {
   const dash = document.getElementById('progress-dashboard');
   if (!dash) return;
@@ -204,26 +204,14 @@ function renderDashboard(done, pct) {
     dash.classList.add('show');
     dash.innerHTML = `
       <div class="dash-title">
-        <span class="sync-dot" style="display:inline-block;margin-right:6px" id="sync-dot-dash"></span>
+        <span class="sync-dot" style="display:inline-block;margin-right:6px"></span>
         ${currentUser.displayName || 'Your'} progress — synced to cloud
       </div>
       <div class="dash-grid">
-        <div class="dash-stat">
-          <div class="dash-stat-num">${done}</div>
-          <div class="dash-stat-label">Sections done</div>
-        </div>
-        <div class="dash-stat">
-          <div class="dash-stat-num">${8 - done}</div>
-          <div class="dash-stat-label">Remaining</div>
-        </div>
-        <div class="dash-stat">
-          <div class="dash-stat-num">${pct}%</div>
-          <div class="dash-stat-label">Complete</div>
-        </div>
-        <div class="dash-stat">
-          <div class="dash-stat-num">${done === 8 ? '🏆' : '🎯'}</div>
-          <div class="dash-stat-label">${done === 8 ? 'Certified!' : 'Keep going'}</div>
-        </div>
+        <div class="dash-stat"><div class="dash-stat-num">${done}</div><div class="dash-stat-label">Sections done</div></div>
+        <div class="dash-stat"><div class="dash-stat-num">${8 - done}</div><div class="dash-stat-label">Remaining</div></div>
+        <div class="dash-stat"><div class="dash-stat-num">${pct}%</div><div class="dash-stat-label">Complete</div></div>
+        <div class="dash-stat"><div class="dash-stat-num">${done === 8 ? '🏆' : '🎯'}</div><div class="dash-stat-label">${done === 8 ? 'Certified!' : 'Keep going'}</div></div>
       </div>
     `;
   } else {
@@ -231,7 +219,7 @@ function renderDashboard(done, pct) {
   }
 }
 
-// ── Prefill certificate name from Google account
+// ── Prefill cert name ──────────────────────────
 function prefillCertName(displayName) {
   const input = document.getElementById('cert-name-input');
   if (input && displayName && !input.value) {
@@ -240,7 +228,7 @@ function prefillCertName(displayName) {
   }
 }
 
-// ── Open / close modal ─────────────────────────
+// ── Modal open/close ───────────────────────────
 window.openCertModal = function() {
   const modal = document.getElementById('cert-modal');
   if (modal) modal.classList.add('open');
@@ -310,65 +298,54 @@ window.drawCertificate = function(recipientName) {
   });
   ctx.globalAlpha = 1;
 
-  // Issuer name (gold, spaced caps)
-  ctx.font      = 'bold 12px "DM Sans", Arial, sans-serif';
-  ctx.fillStyle = '#c9a84c';
-  ctx.textAlign = 'center';
+  // Issuer name
+  ctx.font         = 'bold 12px "DM Sans", Arial, sans-serif';
+  ctx.fillStyle    = '#c9a84c';
+  ctx.textAlign    = 'center';
   ctx.letterSpacing = '0.18em';
   ctx.fillText(CERT.issuer.toUpperCase(), W/2, 88);
 
-  // Decorative rules
   drawRule(ctx, W/2, 106, 240);
 
-  // "Certificate of Completion"
   ctx.font         = '13px "DM Sans", Arial, sans-serif';
   ctx.fillStyle    = '#9e9990';
   ctx.letterSpacing = '0.14em';
   ctx.fillText('CERTIFICATE OF COMPLETION', W/2, 132);
 
-  // Course name (italic)
   ctx.font         = 'italic bold 21px Georgia, serif';
   ctx.fillStyle    = '#2a4a2a';
   ctx.letterSpacing = '0';
   ctx.fillText(CERT.course, W/2, 165);
 
-  // "This certifies that"
   ctx.font      = '13px "DM Sans", Arial, sans-serif';
   ctx.fillStyle = '#b0a898';
   ctx.fillText('This certifies that', W/2, 210);
 
-  // Recipient name — large italic serif
+  // Recipient name
   const name = (recipientName || 'Your Name').trim();
   ctx.font      = 'italic bold 52px Georgia, serif';
   ctx.fillStyle = '#1a2e1a';
-  // Scale down if name is very long
-  const nameMetrics = ctx.measureText(name);
-  if (nameMetrics.width > 700) {
-    const scale = 700 / nameMetrics.width;
-    ctx.font = `italic bold ${Math.floor(52 * scale)}px Georgia, serif`;
+  if (ctx.measureText(name).width > 700) {
+    ctx.font = `italic bold ${Math.floor(52 * 700 / ctx.measureText(name).width)}px Georgia, serif`;
   }
   ctx.fillText(name, W/2, 288);
 
-  // Gold underline beneath name
+  // Gold underline
   const nw = Math.min(ctx.measureText(name).width + 80, 520);
   ctx.strokeStyle = '#c9a84c';
   ctx.lineWidth   = 1.5;
   ctx.beginPath();
-  ctx.moveTo(W/2 - nw/2, 306);
-  ctx.lineTo(W/2 + nw/2, 306);
+  ctx.moveTo(W/2 - nw/2, 306); ctx.lineTo(W/2 + nw/2, 306);
   ctx.stroke();
 
-  // "has successfully completed all 8 modules of"
   ctx.font      = '13px "DM Sans", Arial, sans-serif';
   ctx.fillStyle = '#6b6560';
   ctx.fillText('has successfully completed all 8 modules of', W/2, 334);
 
-  // Course title (bold)
   ctx.font      = 'bold 19px Georgia, serif';
   ctx.fillStyle = '#1a2e1a';
   ctx.fillText(CERT.course, W/2, 363);
 
-  // Module list
   ctx.font      = '10.5px "DM Sans", Arial, sans-serif';
   ctx.fillStyle = '#b0a898';
   ctx.fillText(
@@ -377,10 +354,9 @@ window.drawCertificate = function(recipientName) {
     W/2, 386
   );
 
-  // Divider rule
   drawRule(ctx, W/2, 408, 320);
 
-  // Date (left side)
+  // Date
   const today = new Date().toLocaleDateString('en-US', {year:'numeric', month:'long', day:'numeric'});
   ctx.textAlign = 'left';
   ctx.font      = '11px "DM Sans", Arial, sans-serif';
@@ -389,12 +365,10 @@ window.drawCertificate = function(recipientName) {
   ctx.font      = 'bold 14px "DM Sans", Arial, sans-serif';
   ctx.fillStyle = '#1a2e1a';
   ctx.fillText(today, 155, 458);
-  // Date underline
-  ctx.strokeStyle = '#e0d8c8';
-  ctx.lineWidth   = 0.75;
+  ctx.strokeStyle = '#e0d8c8'; ctx.lineWidth = 0.75;
   ctx.beginPath(); ctx.moveTo(155, 466); ctx.lineTo(370, 466); ctx.stroke();
 
-  // Signature (right side)
+  // Signature
   ctx.textAlign = 'right';
   ctx.font      = '11px "DM Sans", Arial, sans-serif';
   ctx.fillStyle = '#b0a898';
@@ -402,23 +376,21 @@ window.drawCertificate = function(recipientName) {
   ctx.font      = 'italic bold 22px Georgia, serif';
   ctx.fillStyle = '#1a2e1a';
   ctx.fillText(CERT.signature, W-155, 462);
-  ctx.strokeStyle = '#e0d8c8';
-  ctx.lineWidth   = 0.75;
+  ctx.strokeStyle = '#e0d8c8'; ctx.lineWidth = 0.75;
   ctx.beginPath(); ctx.moveTo(W-370, 470); ctx.lineTo(W-115, 470); ctx.stroke();
 
-  // Centre seal
+  // Seal
   drawSeal(ctx, W/2, 452);
 
   // Footer
-  ctx.textAlign    = 'center';
-  ctx.font         = '9.5px "DM Sans", Arial, sans-serif';
-  ctx.fillStyle    = '#c9a84c';
-  ctx.globalAlpha  = 0.55;
+  ctx.textAlign   = 'center';
+  ctx.font        = '9.5px "DM Sans", Arial, sans-serif';
+  ctx.fillStyle   = '#c9a84c';
+  ctx.globalAlpha = 0.55;
   ctx.fillText(CERT.website, W/2, H-42);
-  ctx.globalAlpha  = 1;
+  ctx.globalAlpha = 1;
 };
 
-// ── Helper: rounded rect path ──────────────────
 function roundRect(ctx, x, y, w, h, r) {
   ctx.beginPath();
   ctx.moveTo(x+r, y);
@@ -429,48 +401,31 @@ function roundRect(ctx, x, y, w, h, r) {
   ctx.closePath();
 }
 
-// ── Helper: gold rule with centre diamond ──────
 function drawRule(ctx, cx, y, halfW) {
-  ctx.strokeStyle = '#c9a84c';
-  ctx.lineWidth   = 0.75;
+  ctx.strokeStyle = '#c9a84c'; ctx.lineWidth = 0.75;
   ctx.beginPath(); ctx.moveTo(cx - halfW, y); ctx.lineTo(cx - 16, y); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(cx + 16, y);  ctx.lineTo(cx + halfW, y); ctx.stroke();
-  ctx.font         = '11px Georgia, serif';
-  ctx.fillStyle    = '#c9a84c';
-  ctx.textAlign    = 'center';
-  ctx.textBaseline = 'middle';
+  ctx.font = '11px Georgia, serif';
+  ctx.fillStyle = '#c9a84c';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.fillText('♦', cx, y);
 }
 
-// ── Helper: wax seal ──────────────────────────
 function drawSeal(ctx, cx, cy) {
-  // Outer ring
-  ctx.beginPath();
-  ctx.arc(cx, cy, 40, 0, Math.PI * 2);
-  ctx.strokeStyle = '#c9a84c';
-  ctx.lineWidth   = 2;
-  ctx.stroke();
-  // Inner ring
-  ctx.beginPath();
-  ctx.arc(cx, cy, 31, 0, Math.PI * 2);
-  ctx.lineWidth = 0.75;
-  ctx.stroke();
-  // Fill
-  ctx.fillStyle = 'rgba(201,168,76,0.06)';
-  ctx.fill();
-  // Spade
-  ctx.font         = 'bold 30px Georgia, serif';
-  ctx.fillStyle    = '#1a2e1a';
-  ctx.textAlign    = 'center';
-  ctx.textBaseline = 'middle';
+  ctx.beginPath(); ctx.arc(cx, cy, 40, 0, Math.PI * 2);
+  ctx.strokeStyle = '#c9a84c'; ctx.lineWidth = 2; ctx.stroke();
+  ctx.beginPath(); ctx.arc(cx, cy, 31, 0, Math.PI * 2);
+  ctx.lineWidth = 0.75; ctx.stroke();
+  ctx.fillStyle = 'rgba(201,168,76,0.06)'; ctx.fill();
+  ctx.font = 'bold 30px Georgia, serif';
+  ctx.fillStyle = '#1a2e1a';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.fillText('♠', cx, cy - 3);
-  // "CERTIFIED" text
-  ctx.font      = '7px "DM Sans", Arial, sans-serif';
+  ctx.font = '7px "DM Sans", Arial, sans-serif';
   ctx.fillStyle = '#c9a84c';
   ctx.fillText('CERTIFIED', cx, cy + 22);
 }
 
-// ── Download PNG ───────────────────────────────
 window.downloadCertificate = function() {
   const canvas = document.getElementById('cert-canvas');
   if (!canvas) return;
@@ -482,22 +437,13 @@ window.downloadCertificate = function() {
   link.click();
 };
 
-// ── Init on DOM ready ──────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-  // Live certificate preview
   const nameInput = document.getElementById('cert-name-input');
   if (nameInput) {
     nameInput.addEventListener('input', () => drawCertificate(nameInput.value));
   }
-  // Close modal on backdrop click
   const modal = document.getElementById('cert-modal');
-  modal?.addEventListener('click', e => {
-    if (e.target === modal) closeCertModal();
-  });
-  // Keyboard close
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') closeCertModal();
-  });
-  // Run eligibility check for non-logged-in users too
+  modal?.addEventListener('click', e => { if (e.target === modal) closeCertModal(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCertModal(); });
   checkCertEligibility();
 });
