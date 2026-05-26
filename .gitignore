@@ -1,0 +1,10 @@
+# Firebase config — NEVER commit this
+scripts/firebase-config.js
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor folders
+.vscode/
+.idea/

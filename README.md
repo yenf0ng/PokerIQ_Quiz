@@ -1,146 +1,187 @@
 # PokerIQ — Texas Hold'em Mastery
 
-A free, interactive Texas Hold'em learning website for casual players who want to improve their game. No signup, no ads, no fluff.
+A free, interactive Texas Hold'em learning website. No framework, no build tools — pure HTML, CSS, and JavaScript. Deploys directly to GitHub Pages.
 
 ## Features
 
-- **8 Learning Sections** — Hand Rankings, Playstyle Types, Odds Calculator, Pot Odds & Equity, Positional Play, Bluffing & Reads, Bankroll Management, Glossary
-- **Interactive Poker Odds Calculator** — Monte Carlo equity simulation vs one opponent
-- **Hand Strength Tester** — Identify randomly dealt 5-card hands
-- **Per-section Quizzes** — 4 questions each with instant feedback
-- **Progress Tracker** — Marks sections complete, persists via localStorage
-- **Searchable Glossary** — 50+ poker terms defined
-- **Mobile Responsive** — Works on all screen sizes
+- 8 learning sections with full content
+- Interactive poker odds calculator (Monte Carlo simulation)
+- Hand strength tester
+- Per-section quizzes (4 questions each)
+- Progress tracker (localStorage + Firestore cloud sync)
+- Google Sign-In
+- Downloadable certificate (Canvas-generated PNG)
+- Searchable glossary (50+ terms)
+- Mobile responsive
 
-## File Structure
+## File structure
 
 ```
-pokeriq/
-├── index.html          # Single entry point
+PokerIQ_Quiz/
+├── index.html                          ← single entry point
 ├── styles/
-│   └── main.css        # All styles
+│   ├── main.css                        ← all site styles
+│   └── auth.css                        ← auth + certificate styles
 ├── scripts/
-│   └── main.js         # All JavaScript
+│   ├── main.js                         ← site logic, quizzes, calculator
+│   ├── auth.js                         ← Firebase auth + certificate generator
+│   ├── firebase-config.template.js     ← copy this → firebase-config.js
+│   └── firebase-config.js              ← YOUR config (gitignored, never pushed)
+├── .gitignore                          ← keeps firebase-config.js off GitHub
 └── README.md
 ```
 
-<<<<<<< HEAD
-## Local Development
+---
 
-No build tools needed. Just open `index.html` in your browser:
+## 1 — Deploy to GitHub Pages
 
 ```bash
-# Option 1: Direct open
-open index.html
-
-# Option 2: Simple local server (Python)
-python3 -m http.server 8080
-# Then visit http://localhost:8080
-
-# Option 3: VS Code Live Server extension
-# Right-click index.html → Open with Live Server
+git add .
+git commit -m "PokerIQ update"
+git push origin main
 ```
 
-## Setting up Firebase (Google Sign-In + Progress Sync)
+Then: **Repo → Settings → Pages → Deploy from branch → main → / (root) → Save**
 
-### Step 1 — Create a Firebase project
+Your site: `https://yenf0ng.github.io/PokerIQ_Quiz/`
+
+---
+
+## 2 — Set up Firebase (Google Sign-In + progress sync)
+
+### Create the project
 1. Go to [console.firebase.google.com](https://console.firebase.google.com)
-2. Click **Add project** → name it `pokeriq` → Continue
-3. Disable Google Analytics (optional) → Create project
+2. **Add project** → name it `pokeriq` → Continue
+3. Disable Google Analytics → **Create project**
 
-### Step 2 — Enable Google Sign-In
-1. In your project → **Authentication** → **Get started**
-2. Under **Sign-in method** → enable **Google** → Save
+### Enable Google Sign-In
+1. Left sidebar → **Authentication** → **Get started**
+2. **Sign-in method** tab → click **Google** → toggle Enable
+3. Set a support email → **Save**
 
-### Step 3 — Create Firestore database
-1. In your project → **Firestore Database** → **Create database**
-2. Choose **Start in test mode** (for development)
-3. Select a region → Enable
+### Create Firestore database
+1. Left sidebar → **Firestore Database** → **Create database**
+2. Choose **Start in test mode** → Next
+3. Pick region `asia-southeast1` (Malaysia) → **Enable**
 
-### Step 4 — Get your web app config
-1. Project Overview → click **</>** (web app) → Register app
-2. Copy the `firebaseConfig` object shown
-3. Paste it into `scripts/auth.js` replacing the `YOUR_*` placeholders
+### Get your web app config
+1. **Project Overview** → gear icon → **Project settings**
+2. Scroll to **Your apps** → click **</>** web icon
+3. App nickname: `pokeriq-web` → **Register app**
+4. Copy the `firebaseConfig` object
 
-### Step 5 — Set Firestore security rules
-In Firestore → **Rules**, replace with:
+### Add your config file locally
+```bash
+# In your project folder:
+cp scripts/firebase-config.template.js scripts/firebase-config.js
+```
+Open `scripts/firebase-config.js` and paste your values:
+```js
+window.FIREBASE_CONFIG = {
+  apiKey:            "AIzaSy...",          // ← your real values
+  authDomain:        "pokeriq-xxxxx.firebaseapp.com",
+  projectId:         "pokeriq-xxxxx",
+  storageBucket:     "pokeriq-xxxxx.appspot.com",
+  messagingSenderId: "123456789012",
+  appId:             "1:123456789012:web:abcdef"
+};
+
+window.CERT_CONFIG = {
+  issuer:    "PokerIQ Academy",        // ← change to your brand
+  course:    "Texas Hold'em Mastery",
+  signature: "PokerIQ",
+  website:   "yenf0ng.github.io/PokerIQ_Quiz"
+};
+```
+
+> **Note:** `firebase-config.js` is in `.gitignore` — it will NEVER be pushed to GitHub. This keeps your API key private.
+
+### Restrict your API key (important)
+1. Go to [console.cloud.google.com/apis/credentials](https://console.cloud.google.com/apis/credentials)
+2. Click your API key → **Application restrictions** → HTTP referrers
+3. Add these:
+   ```
+   yenf0ng.github.io/*
+   localhost/*
+   127.0.0.1/*
+   ```
+4. **Save** — now the key is useless on any other domain
+
+### Set Firestore security rules
+1. Firestore → **Rules** tab → replace with:
 ```
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read, write: if request.auth != null
+                         && request.auth.uid == userId;
     }
   }
 }
 ```
-Click **Publish**.
+2. Click **Publish**
 
-### Step 6 — Customise your certificate
-In `scripts/auth.js`, edit the three branding constants at the top:
-```js
-const CERT_ISSUER    = "PokerIQ Academy";     // shown at top
-const CERT_COURSE    = "Texas Hold'em Mastery"; // course title
-const CERT_SIGNATURE = "PokerIQ";              // signature line
-```
-
-
-
-### Step 1 — Create a GitHub repository
-
-1. Go to [github.com](https://github.com) and sign in
-2. Click **New repository** (the `+` button, top right)
-3. Name it `pokeriq` (or any name you like)
-4. Set it to **Public**
-5. Click **Create repository**
-
-### Step 2 — Push your code
-
-```bash
-# In your project folder:
-git init
-git add .
-git commit -m "Initial commit — PokerIQ site"
-git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/pokeriq.git
-git push -u origin main
-```
-
-### Step 3 — Enable GitHub Pages
-
-1. In your repository, click **Settings**
-2. Scroll down to **Pages** in the left sidebar
-3. Under **Source**, select **Deploy from a branch**
-4. Set branch to `main`, folder to `/ (root)`
-5. Click **Save**
-
-### Step 4 — Access your site
-
-After 1-2 minutes, your site will be live at:
-
-```
-https://YOUR_USERNAME.github.io/pokeriq/
-```
-
-GitHub will show a green banner in Settings → Pages when it's ready.
-
-## Customisation
-
-- **Site name**: Search and replace `PokerIQ` in `index.html`
-- **Colours**: Edit CSS variables in `:root` at the top of `styles/main.css`
-- **Quiz questions**: Edit the `quizData` object in `scripts/main.js`
-- **Glossary terms**: Add new `<div class="glossary-term">` entries in `index.html`
-- **New sections**: Add a nav item, a `section-page` div, and quiz data entry
-
-## Tech Stack
-
-- Pure HTML5, CSS3, Vanilla JavaScript
-- Google Fonts (Playfair Display + DM Sans + DM Mono)
-- No frameworks, no build tools, no dependencies
-- localStorage for progress persistence
+### Authorise your GitHub Pages domain
+1. Firebase → **Authentication** → **Settings** tab
+2. Scroll to **Authorised domains** → **Add domain**
+3. Add: `yenf0ng.github.io`
+4. **Add**
 
 ---
 
-=======
->>>>>>> 20bc618bcc3a491280bebe810bec5b4b89b18c6f
-Built for learning. Good luck at the tables. ♠♥♦♣
+## 3 — Local development
+
+```bash
+# Python (easiest)
+python3 -m http.server 8080
+# Visit http://localhost:8080
+
+# Node
+npx serve .
+```
+
+> You must use a local server (not just open index.html directly) because
+> Firebase Auth requires a proper HTTP origin.
+
+---
+
+## 4 — Customise the certificate
+
+In `scripts/firebase-config.js`, edit `window.CERT_CONFIG`:
+
+```js
+window.CERT_CONFIG = {
+  issuer:    "Your Academy Name",   // printed at the top
+  course:    "Your Course Name",    // course title line
+  signature: "Your Name",          // signature / issued by
+  website:   "your-site.github.io" // footer URL
+};
+```
+
+The certificate preview updates live as you type your name in the modal.
+
+---
+
+## 5 — Common errors
+
+| Error | Cause | Fix |
+|---|---|---|
+| `auth/unauthorized-domain` | GitHub Pages not in allowed list | Auth → Settings → Authorised domains → add `yenf0ng.github.io` |
+| `Missing or insufficient permissions` | Firestore rules wrong | Re-paste rules from Step 2 and Publish |
+| `Firebase: Error (auth/api-key-not-valid)` | Wrong API key | Check your `firebase-config.js` values |
+| Sign-in popup blocked | Browser blocked popup | Allow popups for your site |
+| Site shows 404 on GitHub Pages | Pages not configured | Settings → Pages → Deploy from branch → main → / (root) |
+| Firebase config not found | `firebase-config.js` missing | Copy from template and fill in values |
+
+---
+
+## Security summary
+
+| Layer | Protection |
+|---|---|
+| `.gitignore` | API key never pushed to GitHub |
+| API key restriction | Key only works on your domain |
+| Firestore rules | Users can only access their own data |
+| Firebase Auth | Unauthenticated requests blocked |
+
