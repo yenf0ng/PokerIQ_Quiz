@@ -24,6 +24,7 @@ pokeriq/
 └── README.md
 ```
 
+<<<<<<< HEAD
 ## Local Development
 
 No build tools needed. Just open `index.html` in your browser:
@@ -140,4 +141,6 @@ GitHub will show a green banner in Settings → Pages when it's ready.
 
 ---
 
+=======
+>>>>>>> 20bc618bcc3a491280bebe810bec5b4b89b18c6f
 Built for learning. Good luck at the tables. ♠♥♦♣
