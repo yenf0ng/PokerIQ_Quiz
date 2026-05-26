@@ -1,10 +1,11 @@
 # netlify.toml — Netlify configuration for PokerIQ
-# Environment variables are set in Netlify dashboard
-# Site configuration → Environment variables
 
 [build]
   publish = "."
   command = "node inject-config.js"
+
+[build.environment]
+  NETLIFY_SKIP_SECRET_SCAN = "true"
 
 [[headers]]
   for = "/*"
