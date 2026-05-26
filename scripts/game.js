@@ -1,320 +1,77 @@
 // ══════════════════════════════════════════════
-//  PokerIQ — Mini Poker Game Engine (game.js)
-//  Educational Texas Hold'em vs bots
-//  No real money — credits only
+//  PokerIQ — Poker Game Engine v2 (fixed)
 // ══════════════════════════════════════════════
 
-const GAME_RANKS = ['2','3','4','5','6','7','8','9','T','J','Q','K','A'];
-const GAME_SUITS = ['♠','♥','♦','♣'];
-const RANK_VAL = Object.fromEntries(GAME_RANKS.map((r,i)=>[r,i]));
+const RANKS = ['2','3','4','5','6','7','8','9','T','J','Q','K','A'];
+const SUITS_LIST = ['♠','♥','♦','♣'];
+const RANK_VAL = {};
+RANKS.forEach((r,i) => RANK_VAL[r] = i);
 
-// ── Deck ───────────────────────────────────────
 function buildDeck() {
   const d = [];
-  SUITS.forEach(s => RANKS.forEach(r => d.push({r,s})));
-  return shuffle(d);
+  SUITS_LIST.forEach(s => RANKS.forEach(r => d.push({r,s})));
+  return gameShuffle(d);
 }
-function shuffle(arr) {
-  for (let i=arr.length-1;i>0;i--) {
+function gameShuffle(arr) {
+  const a = [...arr];
+  for (let i=a.length-1;i>0;i--) {
     const j=Math.floor(Math.random()*(i+1));
-    [arr[i],arr[j]]=[arr[j],arr[i]];
+    [a[i],a[j]]=[a[j],a[i]];
   }
-  return arr;
+  return a;
 }
-function cardStr(c) { return c.r+c.s; }
 function isRed(c) { return c.s==='♥'||c.s==='♦'; }
 
-// ── Hand Evaluator ─────────────────────────────
-function evalHand(cards) {
-  const best = { score: -1, name: '' };
-  const combos = getCombos(cards, 5);
-  combos.forEach(combo => {
-    const res = scoreHand(combo);
-    if (res.score > best.score) { best.score = res.score; best.name = res.name; best.cards = combo; }
-  });
-  return best;
-}
+// ── Hand Evaluator ──────────────────────────────
 function getCombos(arr, k) {
-  if (k===arr.length) return [arr];
+  if (k===arr.length) return [[...arr]];
   if (k===1) return arr.map(x=>[x]);
   const result = [];
-  arr.forEach((item,i) => {
-    getCombos(arr.slice(i+1), k-1).forEach(combo => result.push([item,...combo]));
-  });
+  for (let i=0;i<=arr.length-k;i++) {
+    getCombos(arr.slice(i+1), k-1).forEach(c => result.push([arr[i],...c]));
+  }
   return result;
 }
-function scoreHand(cards) {
+
+function scoreHand5(cards) {
   const rs = cards.map(c=>c.r);
   const ss = cards.map(c=>c.s);
   const vs = rs.map(r=>RANK_VAL[r]).sort((a,b)=>b-a);
-  const flush = ss.every(s=>s===ss[0]);
-  const straight = (vs.every((v,i)=>i===0||vs[i-1]-v===1)) ||
+  const isFlush = ss.every(s=>s===ss[0]);
+  const isStraight = vs.every((v,i)=>i===0||vs[i-1]-v===1) ||
     (vs[0]===12&&vs[1]===3&&vs[2]===2&&vs[3]===1&&vs[4]===0);
-  const counts = {};
-  rs.forEach(r=>counts[r]=(counts[r]||0)+1);
-  const cv = Object.values(counts).sort((a,b)=>b-a);
-  const names = ['High Card','One Pair','Two Pair','Three of a Kind','Straight','Flush','Full House','Four of a Kind','Straight Flush','Royal Flush'];
+  const freq = {};
+  rs.forEach(r=>freq[r]=(freq[r]||0)+1);
+  const counts = Object.values(freq).sort((a,b)=>b-a);
+  const NAMES = ['High Card','One Pair','Two Pair','Three of a Kind','Straight','Flush','Full House','Four of a Kind','Straight Flush','Royal Flush'];
   let score;
-  if (flush && straight && vs[0]===12) score=9;
-  else if (flush && straight) score=8;
-  else if (cv[0]===4) score=7;
-  else if (cv[0]===3&&cv[1]===2) score=6;
-  else if (flush) score=5;
-  else if (straight) score=4;
-  else if (cv[0]===3) score=3;
-  else if (cv[0]===2&&cv[1]===2) score=2;
-  else if (cv[0]===2) score=1;
+  if (isFlush&&isStraight&&vs[0]===12) score=9;
+  else if (isFlush&&isStraight) score=8;
+  else if (counts[0]===4) score=7;
+  else if (counts[0]===3&&counts[1]===2) score=6;
+  else if (isFlush) score=5;
+  else if (isStraight) score=4;
+  else if (counts[0]===3) score=3;
+  else if (counts[0]===2&&counts[1]===2) score=2;
+  else if (counts[0]===2) score=1;
   else score=0;
-  return { score, name: names[score], tiebreak: vs };
+  return {score, name:NAMES[score], tiebreak:vs};
 }
 
-// ── Bot Personalities ──────────────────────────
-const BOT_TYPES = {
-  TAG:  { name:'TAG Bot',  emoji:'🎯', desc:'Tight Aggressive — raises strong, folds weak' },
-  LAG:  { name:'LAG Bot',  emoji:'🔥', desc:'Loose Aggressive — plays many hands, bluffs often' },
-  Fish: { name:'Fish Bot', emoji:'🐟', desc:'Calls everything, rarely raises' },
-  Nit:  { name:'Nit Bot',  emoji:'🪨', desc:'Only plays premium hands, folds most' }
-};
-
-function botDecision(bot, handStrength, pot, toCall, stack, stage) {
-  const r = Math.random();
-  const hs = handStrength; // 0-9
-  const pct = toCall / (pot + toCall + 0.01);
-
-  switch(bot.type) {
-    case 'TAG':
-      if (hs >= 6) return { action:'raise', amount: Math.min(pot, stack) };
-      if (hs >= 3 && pct < 0.4) return { action:'call' };
-      if (hs >= 2 && toCall===0) return { action:'check' };
-      return { action:'fold' };
-
-    case 'LAG':
-      if (hs >= 5) return { action:'raise', amount: Math.min(Math.floor(pot*0.75), stack) };
-      if (r < 0.35 && stack > toCall*2) return { action:'raise', amount: Math.min(Math.floor(pot*0.5), stack) };
-      if (hs >= 2 || r < 0.5) return toCall===0 ? { action:'check' } : { action:'call' };
-      return { action:'fold' };
-
-    case 'Fish':
-      if (hs >= 7) return { action:'raise', amount: Math.min(Math.floor(pot*0.5), stack) };
-      if (toCall===0) return { action:'check' };
-      return { action:'call' };
-
-    case 'Nit':
-      if (hs >= 7) return { action:'raise', amount: Math.min(pot, stack) };
-      if (hs >= 5 && pct < 0.25) return { action:'call' };
-      if (toCall===0) return { action:'check' };
-      return { action:'fold' };
-
-    default:
-      return toCall===0 ? { action:'check' } : { action:'fold' };
+function evalBest(cards) {
+  if (cards.length < 5) {
+    const dummy = cards.concat(Array(5-cards.length).fill({r:'2',s:'♠'}));
+    return scoreHand5(dummy);
   }
-}
-
-// ── Game State ─────────────────────────────────
-let G = null;
-
-function initGame(botCount, botTypes) {
-  const deck = buildDeck();
-  const bots = botTypes.map((type, i) => ({
-    id: 'bot'+i, name: BOT_TYPES[type].name,
-    emoji: BOT_TYPES[type].emoji, type,
-    stack: 500, hole: [], folded: false, bet: 0, allIn: false
-  }));
-
-  G = {
-    deck, stage: 'preflop',
-    pot: 0, board: [],
-    player: { id:'player', name:'You', stack:500, hole:[], folded:false, bet:0, allIn:false },
-    bots,
-    dealer: 0,
-    SB: 10, BB: 20,
-    toAct: 0, lastRaise: 20,
-    actionLog: [],
-    result: null,
-    waitingForPlayer: false,
-    handOver: false
-  };
-
-  dealHoleCards();
-  postBlinds();
-  return G;
-}
-
-function dealHoleCards() {
-  G.player.hole = [G.deck.pop(), G.deck.pop()];
-  G.bots.forEach(b => b.hole = [G.deck.pop(), G.deck.pop()]);
-}
-
-function postBlinds() {
-  const sb = G.bots[0];
-  const bb = G.bots.length > 1 ? G.bots[1] : G.player;
-  deductBet(sb, G.SB);
-  deductBet(bb, G.BB);
-  G.pot += G.SB + G.BB;
-  G.lastRaise = G.BB;
-  log(`${sb.name} posts SB ${G.SB}`);
-  log(`${bb.name} posts BB ${G.BB}`);
-}
-
-function deductBet(actor, amount) {
-  const actual = Math.min(amount, actor.stack);
-  actor.stack -= actual;
-  actor.bet += actual;
-  if (actor.stack===0) actor.allIn = true;
-  return actual;
-}
-
-function log(msg) { G.actionLog.unshift(msg); if(G.actionLog.length>12) G.actionLog.pop(); }
-
-// ── Player Action ──────────────────────────────
-function playerAction(action, raiseAmount) {
-  if (!G || G.handOver || !G.waitingForPlayer) return;
-  G.waitingForPlayer = false;
-
-  const toCall = getToCall(G.player);
-
-  if (action==='fold') {
-    G.player.folded = true;
-    log('You fold');
-  } else if (action==='check' && toCall===0) {
-    log('You check');
-  } else if (action==='call') {
-    const amt = deductBet(G.player, toCall);
-    G.pot += amt;
-    log(`You call ${amt}`);
-  } else if (action==='raise') {
-    const amt = Math.min(raiseAmount || G.BB*2, G.player.stack);
-    const toCallFirst = toCall;
-    const totalBet = toCallFirst + amt;
-    const actual = deductBet(G.player, totalBet);
-    G.pot += actual;
-    G.lastRaise = amt;
-    log(`You raise to ${G.player.bet}`);
-  } else if (action==='allin') {
-    const amt = deductBet(G.player, G.player.stack);
-    G.pot += amt;
-    G.player.allIn = true;
-    log(`You go ALL-IN (${amt})`);
-  }
-
-  setTimeout(() => runBotActions(), 600);
-}
-window.playerAction = playerAction;
-
-function getToCall(actor) {
-  const maxBet = Math.max(G.player.bet, ...G.bots.map(b=>b.bet));
-  return Math.max(0, maxBet - actor.bet);
-}
-
-// ── Bot Actions ────────────────────────────────
-function runBotActions() {
-  const activeBots = G.bots.filter(b=>!b.folded&&!b.allIn);
-  if (!activeBots.length) { advanceStage(); return; }
-
-  let i = 0;
-  function nextBot() {
-    if (i >= activeBots.length) { advanceStage(); return; }
-    const bot = activeBots[i++];
-    const allCards = [...bot.hole, ...G.board];
-    const hs = allCards.length >= 5 ? evalHand(allCards).score : estimatePreflop(bot.hole);
-    const toCall = getToCall(bot);
-    const dec = botDecision(bot, hs, G.pot, toCall, bot.stack, G.stage);
-
-    if (dec.action==='fold') {
-      bot.folded = true;
-      log(`${bot.name} folds`);
-    } else if (dec.action==='check') {
-      log(`${bot.name} checks`);
-    } else if (dec.action==='call') {
-      const amt = deductBet(bot, toCall);
-      G.pot += amt;
-      log(`${bot.name} calls ${amt}`);
-    } else if (dec.action==='raise') {
-      const toCallFirst = toCall;
-      const total = toCallFirst + dec.amount;
-      const actual = deductBet(bot, total);
-      G.pot += actual;
-      G.lastRaise = dec.amount;
-      log(`${bot.name} raises to ${bot.bet}`);
-    }
-
-    renderGame();
-    setTimeout(nextBot, 800);
-  }
-  nextBot();
-}
-
-function estimatePreflop(hole) {
-  const v0 = RANK_VAL[hole[0].r], v1 = RANK_VAL[hole[1].r];
-  const paired = hole[0].r === hole[1].r;
-  const suited = hole[0].s === hole[1].s;
-  const high = Math.max(v0,v1);
-  const sum = v0+v1;
-  if (paired && high>=10) return 7;
-  if (paired && high>=7) return 5;
-  if (paired) return 3;
-  if (high===12&&sum>=20) return 6;
-  if (high>=10&&sum>=18&&suited) return 5;
-  if (high>=10&&sum>=18) return 4;
-  if (suited&&sum>=15) return 3;
-  if (sum>=18) return 3;
-  if (sum>=14) return 2;
-  return 1;
-}
-
-// ── Advance Stage ──────────────────────────────
-function advanceStage() {
-  const activePlayers = [G.player,...G.bots].filter(p=>!p.folded);
-
-  if (activePlayers.length===1) {
-    awardPot(activePlayers[0]);
-    return;
-  }
-
-  // Reset bets for new street
-  [G.player,...G.bots].forEach(p=>p.bet=0);
-
-  if (G.stage==='preflop') {
-    G.stage='flop';
-    G.board=[G.deck.pop(),G.deck.pop(),G.deck.pop()];
-    log('--- Flop ---');
-  } else if (G.stage==='flop') {
-    G.stage='turn';
-    G.board.push(G.deck.pop());
-    log('--- Turn ---');
-  } else if (G.stage==='turn') {
-    G.stage='river';
-    G.board.push(G.deck.pop());
-    log('--- River ---');
-  } else if (G.stage==='river') {
-    showdown();
-    return;
-  }
-
-  renderGame();
-  G.waitingForPlayer = true;
-  renderActions();
-}
-
-// ── Showdown ───────────────────────────────────
-function showdown() {
-  G.stage = 'showdown';
-  const activePlayers = [G.player,...G.bots].filter(p=>!p.folded);
-  let winner = null, bestScore = -1;
-
-  activePlayers.forEach(p => {
-    const res = evalHand([...p.hole,...G.board]);
-    p.handResult = res;
-    if (res.score > bestScore || (res.score===bestScore && compareTiebreak(res.tiebreak, winner?.handResult?.tiebreak))) {
-      bestScore = res.score;
-      winner = p;
-    }
+  let best = {score:-1};
+  getCombos(cards,5).forEach(combo => {
+    const res = scoreHand5(combo);
+    if (res.score > best.score || (res.score===best.score && compareTB(res.tiebreak, best.tiebreak))) best=res;
   });
-
-  awardPot(winner);
+  return best;
 }
 
-function compareTiebreak(a, b) {
+function compareTB(a,b) {
   if (!b) return true;
   for (let i=0;i<Math.min(a.length,b.length);i++) {
     if (a[i]>b[i]) return true;
@@ -323,205 +80,364 @@ function compareTiebreak(a, b) {
   return false;
 }
 
-function awardPot(winner) {
-  winner.stack += G.pot;
-  G.result = { winner, pot: G.pot };
-  G.handOver = true;
-  const isPlayer = winner.id==='player';
-  log(`🏆 ${winner.name} wins ${G.pot} credits!`);
-  if (isPlayer) log('✓ Great hand!');
+// ── Bot AI ──────────────────────────────────────
+const BOT_CONFIGS = {
+  TAG:  {name:'TAG',  emoji:'🎯', label:'Tight Aggressive'},
+  LAG:  {name:'LAG',  emoji:'🔥', label:'Loose Aggressive'},
+  Fish: {name:'Fish', emoji:'🐟', label:'Calling Station'},
+  Nit:  {name:'Nit',  emoji:'🪨', label:'Ultra Tight'}
+};
 
-  // Save credits to Firestore
-  if (typeof window.saveCredits === 'function') {
-    window.saveCredits(G.player.stack);
+function preflopStrength(hole) {
+  const v0=RANK_VAL[hole[0].r], v1=RANK_VAL[hole[1].r];
+  const hi=Math.max(v0,v1), lo=Math.min(v0,v1);
+  const paired=hole[0].r===hole[1].r;
+  const suited=hole[0].s===hole[1].s;
+  if (paired&&hi>=10) return 8;
+  if (paired&&hi>=6)  return 5;
+  if (paired)         return 3;
+  if (hi===12&&lo>=9) return 7;
+  if (hi>=10&&lo>=8&&suited) return 6;
+  if (hi>=10&&lo>=8)  return 5;
+  if (hi>=9&&suited)  return 4;
+  if (hi>=9)          return 3;
+  if (suited)         return 2;
+  return 1;
+}
+
+function botDecide(bot, hs, pot, toCall, stack) {
+  const r = Math.random();
+  const potOdds = pot>0 ? toCall/(pot+toCall) : 0;
+  switch(bot.type) {
+    case 'TAG':
+      if (hs>=6) return {action:'raise', amount:Math.max(pot, toCall*2)};
+      if (hs>=3&&potOdds<0.4) return {action:'call'};
+      if (hs>=2&&toCall===0)  return {action:'check'};
+      return {action:'fold'};
+    case 'LAG':
+      if (hs>=5) return {action:'raise', amount:Math.floor(pot*0.75)||toCall*2};
+      if (r<0.3) return {action:'raise', amount:Math.floor(pot*0.4)||toCall*2};
+      if (hs>=2||r<0.6) return toCall===0?{action:'check'}:{action:'call'};
+      return {action:'fold'};
+    case 'Fish':
+      if (hs>=7) return {action:'raise', amount:Math.floor(pot*0.5)||toCall*2};
+      return toCall===0?{action:'check'}:{action:'call'};
+    case 'Nit':
+      if (hs>=7) return {action:'raise', amount:pot||toCall*2};
+      if (hs>=5&&potOdds<0.2) return {action:'call'};
+      return toCall===0?{action:'check'}:{action:'fold'};
+    default:
+      return toCall===0?{action:'check'}:{action:'fold'};
+  }
+}
+
+// ── Game State ──────────────────────────────────
+let GAME = null;
+
+window.initGame = function(botTypes) {
+  const deck = buildDeck();
+  const bots = botTypes.map((type,i)=>({
+    id:'bot'+i, type,
+    name: BOT_CONFIGS[type].emoji+' '+BOT_CONFIGS[type].label,
+    stack:500, hole:[], folded:false, bet:0, allIn:false, handResult:null
+  }));
+  GAME = {
+    deck, bots,
+    player:{id:'player',stack:window.playerCredits||500,hole:[],folded:false,bet:0,allIn:false,handResult:null},
+    board:[], pot:0, stage:'preflop',
+    SB:10, BB:20, lastRaise:20,
+    log:[], handOver:false, waitingForPlayer:false, result:null
+  };
+  dealAll();
+  postBlinds();
+  gameRender();
+  setTimeout(()=>{GAME.waitingForPlayer=true; renderActions();},1000);
+};
+
+function dealAll() {
+  GAME.player.hole=[GAME.deck.pop(),GAME.deck.pop()];
+  GAME.bots.forEach(b=>b.hole=[GAME.deck.pop(),GAME.deck.pop()]);
+}
+
+function postBlinds() {
+  const sb=GAME.bots[0];
+  const bb=GAME.bots.length>1?GAME.bots[1]:GAME.player;
+  applyBet(sb,GAME.SB); GAME.pot+=GAME.SB;
+  applyBet(bb,GAME.BB); GAME.pot+=GAME.BB;
+  addLog(`${sb.name} posts SB ${GAME.SB} • ${bb.name} posts BB ${GAME.BB}`);
+}
+
+function applyBet(actor,amt) {
+  const actual=Math.min(amt,actor.stack);
+  actor.stack-=actual; actor.bet+=actual;
+  if(actor.stack===0) actor.allIn=true;
+  return actual;
+}
+
+function getToCall(actor) {
+  const maxBet=Math.max(GAME.player.bet,...GAME.bots.map(b=>b.bet));
+  return Math.max(0,maxBet-actor.bet);
+}
+
+function addLog(msg) { GAME.log.unshift(msg); if(GAME.log.length>10) GAME.log.pop(); }
+
+// ── Player actions ──────────────────────────────
+window.playerAction = function(action, raiseAmt) {
+  if(!GAME||GAME.handOver||!GAME.waitingForPlayer) return;
+  GAME.waitingForPlayer=false;
+  const toCall=getToCall(GAME.player);
+
+  if(action==='fold') {
+    GAME.player.folded=true; addLog('You fold');
+  } else if(action==='check'&&toCall===0) {
+    addLog('You check');
+  } else if(action==='call') {
+    const a=applyBet(GAME.player,toCall); GAME.pot+=a; addLog(`You call ${a}`);
+  } else if(action==='raise') {
+    const total=toCall+(raiseAmt||GAME.BB*2);
+    const a=applyBet(GAME.player,total); GAME.pot+=a;
+    GAME.lastRaise=raiseAmt||GAME.BB*2;
+    addLog(`You raise → ${GAME.player.bet}`);
+  } else if(action==='allin') {
+    const a=applyBet(GAME.player,GAME.player.stack); GAME.pot+=a;
+    addLog(`You ALL-IN (${a})`);
   }
 
-  renderGame();
+  gameRender();
+  setTimeout(doBotActions, 700);
+};
+
+window.showRaiseSlider = function() {
+  const el=document.getElementById('raise-panel');
+  if(el) el.style.display=el.style.display==='none'?'block':'none';
+};
+window.confirmRaise = function() {
+  const v=parseInt(document.getElementById('raise-slider')?.value||GAME.BB*2);
+  playerAction('raise',v);
+};
+
+// ── Bot turn ────────────────────────────────────
+function doBotActions() {
+  const active=GAME.bots.filter(b=>!b.folded&&!b.allIn);
+  let i=0;
+  function next() {
+    if(i>=active.length){advanceStreet();return;}
+    const bot=active[i++];
+    const allC=[...bot.hole,...GAME.board];
+    const hs=GAME.board.length>=3?evalBest(allC).score:preflopStrength(bot.hole);
+    const toCall=getToCall(bot);
+    const dec=botDecide(bot,hs,GAME.pot,toCall,bot.stack);
+
+    if(dec.action==='fold'){bot.folded=true;addLog(`${bot.name} folds`);}
+    else if(dec.action==='check'){addLog(`${bot.name} checks`);}
+    else if(dec.action==='call'){const a=applyBet(bot,toCall);GAME.pot+=a;addLog(`${bot.name} calls ${a}`);}
+    else if(dec.action==='raise'){
+      const total=getToCall(bot)+(dec.amount||GAME.BB*2);
+      const a=applyBet(bot,total);GAME.pot+=a;
+      addLog(`${bot.name} raises → ${bot.bet}`);
+    }
+    gameRender();
+    setTimeout(next,800);
+  }
+  next();
+}
+
+// ── Street logic ────────────────────────────────
+function advanceStreet() {
+  const alive=[GAME.player,...GAME.bots].filter(p=>!p.folded);
+  if(alive.length===1){awardPot(alive[0]);return;}
+
+  [GAME.player,...GAME.bots].forEach(p=>p.bet=0);
+
+  if(GAME.stage==='preflop'){
+    GAME.stage='flop';
+    GAME.board=[GAME.deck.pop(),GAME.deck.pop(),GAME.deck.pop()];
+    addLog('━━ Flop ━━');
+  } else if(GAME.stage==='flop'){
+    GAME.stage='turn';
+    GAME.board.push(GAME.deck.pop());
+    addLog('━━ Turn ━━');
+  } else if(GAME.stage==='turn'){
+    GAME.stage='river';
+    GAME.board.push(GAME.deck.pop());
+    addLog('━━ River ━━');
+  } else {
+    doShowdown(); return;
+  }
+
+  gameRender();
+  GAME.waitingForPlayer=true;
+  renderActions();
+}
+
+// ── Showdown ────────────────────────────────────
+function doShowdown() {
+  GAME.stage='showdown';
+  const alive=[GAME.player,...GAME.bots].filter(p=>!p.folded);
+  let winner=null, best=-1;
+  alive.forEach(p=>{
+    const res=evalBest([...p.hole,...GAME.board]);
+    p.handResult=res;
+    if(res.score>best||(res.score===best&&compareTB(res.tiebreak,winner?.handResult?.tiebreak))){
+      best=res.score; winner=p;
+    }
+  });
+  awardPot(winner);
+}
+
+function awardPot(winner) {
+  winner.stack+=GAME.pot;
+  GAME.result={winner,pot:GAME.pot};
+  GAME.handOver=true;
+  addLog(`🏆 ${winner.id==='player'?'You win':''+winner.name+' wins'} ${GAME.pot} cr!`);
+  if(window.saveCredits) window.saveCredits(GAME.player.stack);
+  gameRender();
   renderResult();
 }
 
-// ── Render Functions ───────────────────────────
-function renderGame() {
-  if (!G) return;
-  const el = document.getElementById('game-area');
-  if (!el) return;
+// ── Render ──────────────────────────────────────
+function gameRender() {
+  const el=document.getElementById('game-area');
+  if(!el||!GAME) return;
 
-  const boardHTML = G.board.map(c =>
-    `<div class="pc ${isRed(c)?'red':''}">${c.r}<span>${c.s}</span></div>`
-  ).join('') || '<div style="color:rgba(255,255,255,0.3);font-size:0.85rem;padding:0.5rem">Waiting for flop...</div>';
+  const boardHTML=GAME.board.length
+    ? GAME.board.map(c=>`<div class="pc ${isRed(c)?'red':''}">${c.r}<span>${c.s}</span></div>`).join('')
+    : `<div style="color:rgba(255,255,255,0.25);font-size:0.8rem">Waiting for flop…</div>`;
 
-  const botsHTML = G.bots.map(bot => `
-    <div class="bot-seat ${bot.folded?'folded':''}">
-      <div class="bot-avatar">${bot.emoji}</div>
-      <div class="bot-info">
-        <div class="bot-name">${bot.name}</div>
-        <div class="bot-stack">${bot.stack} cr</div>
+  const botsHTML=GAME.bots.map(b=>`
+    <div class="bot-seat${b.folded?' folded':''}">
+      <div style="font-size:1.3rem">${b.type?BOT_CONFIGS[b.type]?.emoji||'🤖':'🤖'}</div>
+      <div style="flex:1;min-width:0">
+        <div class="bot-name">${b.name}</div>
+        <div class="bot-stack">${b.stack} cr${b.allIn?' · ALL-IN':''}</div>
       </div>
       <div class="bot-cards">
-        ${G.stage==='showdown'&&!bot.folded
-          ? bot.hole.map(c=>`<div class="pc sm ${isRed(c)?'red':''}">${c.r}<span>${c.s}</span></div>`).join('')
-          : '<div class="pc sm back"></div><div class="pc sm back"></div>'
-        }
+        ${GAME.stage==='showdown'&&!b.folded
+          ? b.hole.map(c=>`<div class="pc sm ${isRed(c)?'red':''}">${c.r}<span>${c.s}</span></div>`).join('')
+          : '<div class="pc sm back">♠</div><div class="pc sm back">♠</div>'}
       </div>
-      ${bot.folded?'<div class="fold-badge">FOLDED</div>':''}
-      ${bot.allIn?'<div class="allin-badge">ALL IN</div>':''}
-      ${bot.handResult&&G.stage==='showdown'?`<div class="hand-badge">${bot.handResult.name}</div>`:''}
-    </div>
-  `).join('');
+      ${b.folded?'<span class="fold-badge">FOLD</span>':''}
+      ${b.handResult&&GAME.stage==='showdown'?`<div class="hand-badge">${b.handResult.name}</div>`:''}
+    </div>`).join('');
 
-  const playerCards = G.player.hole.map(c =>
-    `<div class="pc lg ${isRed(c)?'red':''}">${c.r}<span>${c.s}</span></div>`
-  ).join('');
+  const pCards=GAME.player.hole.map(c=>
+    `<div class="pc lg ${isRed(c)?'red':''}">${c.r}<span>${c.s}</span></div>`).join('');
 
-  el.innerHTML = `
+  el.innerHTML=`
     <div class="game-table">
       <div class="bots-row">${botsHTML}</div>
       <div class="board-area">
-        <div class="pot-display">Pot: ${G.pot} credits</div>
+        <div class="pot-display">Pot: ${GAME.pot} credits</div>
         <div class="board-cards">${boardHTML}</div>
-        <div class="stage-badge">${G.stage.toUpperCase()}</div>
+        <div class="stage-badge">${GAME.stage.toUpperCase()}</div>
       </div>
       <div class="player-area">
-        <div class="player-cards">${playerCards}</div>
+        <div class="player-cards">${pCards}</div>
         <div class="player-meta">
           <span class="player-label">You</span>
-          <span class="player-stack">${G.player.stack} cr</span>
-          ${G.player.folded?'<span class="fold-badge">FOLDED</span>':''}
-          ${G.player.allIn?'<span class="allin-badge">ALL IN</span>':''}
-          ${G.player.handResult&&G.stage==='showdown'?`<span class="hand-badge">${G.player.handResult.name}</span>`:''}
+          <span class="player-stack">${GAME.player.stack} cr</span>
+          ${GAME.player.folded?'<span class="fold-badge">FOLD</span>':''}
+          ${GAME.player.allIn?'<span class="allin-badge">ALL-IN</span>':''}
+          ${GAME.player.handResult&&GAME.stage==='showdown'?`<span class="hand-badge">${GAME.player.handResult.name}</span>`:''}
         </div>
       </div>
     </div>
-    <div class="action-log">
-      ${G.actionLog.slice(0,6).map(l=>`<div class="log-line">${l}</div>`).join('')}
-    </div>
-  `;
+    <div class="action-log">${GAME.log.slice(0,6).map(l=>`<div class="log-line">${l}</div>`).join('')}</div>`;
 }
 
 function renderActions() {
-  const el = document.getElementById('game-actions');
-  if (!el || !G || G.handOver) return;
-  const toCall = getToCall(G.player);
-  const canCheck = toCall===0;
-  el.innerHTML = `
+  const el=document.getElementById('game-actions');
+  if(!el||!GAME||GAME.handOver) return;
+  const toCall=getToCall(GAME.player);
+  const canCheck=toCall===0;
+  const minRaise=Math.min(GAME.BB*2,GAME.player.stack);
+  el.innerHTML=`
     <div class="action-btns">
-      <button class="abtn fold" onclick="playerAction('fold')">Fold</button>
+      <button class="abtn fold"  onclick="playerAction('fold')">Fold</button>
       ${canCheck
-        ? `<button class="abtn check" onclick="playerAction('check')">Check</button>`
-        : `<button class="abtn call" onclick="playerAction('call')">Call ${toCall}</button>`}
-      <button class="abtn raise" onclick="showRaiseInput()">Raise</button>
-      <button class="abtn allin" onclick="playerAction('allin')">All-In</button>
+        ?`<button class="abtn check" onclick="playerAction('check')">Check</button>`
+        :`<button class="abtn call"  onclick="playerAction('call')">Call ${toCall}</button>`}
+      ${GAME.player.stack>toCall
+        ?`<button class="abtn raise" onclick="showRaiseSlider()">Raise ▾</button>`:''}
+      <button class="abtn allin" onclick="playerAction('allin')">All-In ${GAME.player.stack}</button>
     </div>
-    <div id="raise-input" style="display:none;margin-top:0.75rem;display:none">
-      <input type="range" id="raise-slider" min="${G.BB*2}" max="${G.player.stack}" step="${G.BB}" value="${G.BB*2}" style="width:100%">
-      <div style="display:flex;gap:0.5rem;margin-top:0.5rem;align-items:center">
-        <span id="raise-val" style="font-size:0.85rem;color:var(--accent);font-weight:600;min-width:80px">${G.BB*2} cr</span>
-        <button class="abtn raise" onclick="confirmRaise()">Confirm Raise</button>
+    <div id="raise-panel" style="display:none;margin-top:0.75rem">
+      <div style="display:flex;align-items:center;gap:0.75rem">
+        <input type="range" id="raise-slider" min="${minRaise}" max="${GAME.player.stack}" step="${GAME.BB}" value="${minRaise}" style="flex:1" oninput="document.getElementById('raise-val').textContent=this.value+' cr'">
+        <span id="raise-val" style="font-size:0.85rem;color:var(--accent);font-weight:600;min-width:60px">${minRaise} cr</span>
+        <button class="abtn raise" onclick="confirmRaise()">Confirm</button>
       </div>
-    </div>
-  `;
-  const slider = document.getElementById('raise-slider');
-  if (slider) slider.addEventListener('input', e => {
-    document.getElementById('raise-val').textContent = e.target.value + ' cr';
-  });
+    </div>`;
 }
-
-window.showRaiseInput = function() {
-  const el = document.getElementById('raise-input');
-  if (el) el.style.display = el.style.display==='none'?'block':'none';
-};
-window.confirmRaise = function() {
-  const v = parseInt(document.getElementById('raise-slider')?.value||G.BB*2);
-  playerAction('raise', v);
-};
 
 function renderResult() {
-  const el = document.getElementById('game-actions');
-  if (!el||!G.result) return;
-  const won = G.result.winner.id==='player';
-  el.innerHTML = `
+  const el=document.getElementById('game-actions');
+  if(!el||!GAME?.result) return;
+  const won=GAME.result.winner.id==='player';
+  el.innerHTML=`
     <div class="result-banner ${won?'win':'lose'}">
       <div class="result-title">${won?'🏆 You Win!':'💀 You Lose'}</div>
-      <div class="result-sub">${G.result.winner.name} wins ${G.result.pot} credits</div>
-      ${won&&G.player.handResult?`<div class="result-hand">${G.player.handResult.name}</div>`:''}
+      <div class="result-sub">${GAME.result.winner.id==='player'?'You win':''+GAME.result.winner.name+' wins'} ${GAME.result.pot} credits${GAME.player.handResult?' · '+GAME.player.handResult.name:''}</div>
     </div>
     <div style="display:flex;gap:0.75rem;margin-top:1rem;flex-wrap:wrap">
-      <button class="btn btn-primary" onclick="startNewHand()">Deal Next Hand</button>
-      <button class="btn btn-secondary" onclick="endGame()">Leave Table</button>
-    </div>
-  `;
+      <button class="btn btn-primary" onclick="nextHand()">Next Hand ▶</button>
+      <button class="btn btn-secondary" onclick="leaveTable()">Leave Table</button>
+    </div>`;
 }
 
-window.startNewHand = function() {
-  if (!G) return;
-  // Remove broke players
-  G.bots = G.bots.filter(b=>b.stack>0);
-  if (!G.bots.length) { endGame(); return; }
-  if (G.player.stack<=0) {
-    // Free rebuy — 100 credits
-    G.player.stack = 100;
-    log('You were broke — rebuy 100 credits');
-  }
-  const types = G.bots.map(b=>b.type);
-  const newG = initGame(types.length, types);
-  newG.player.stack = G.player.stack;
-  newG.bots.forEach((b,i)=>{ if(G.bots[i]) b.stack=G.bots[i].stack; });
-  G = newG;
-  renderGame();
-  setTimeout(()=>{G.waitingForPlayer=true;renderActions();},1200);
+window.nextHand = function() {
+  if(!GAME) return;
+  GAME.bots=GAME.bots.filter(b=>b.stack>0);
+  if(!GAME.bots.length){leaveTable();return;}
+  if(GAME.player.stack<=0){GAME.player.stack=100;addLog('Rebuy: +100 credits');}
+  const types=GAME.bots.map(b=>b.type);
+  window.initGame(types);
 };
 
-window.endGame = function() {
-  if (typeof window.saveCredits==='function') window.saveCredits(G?.player?.stack||500);
-  document.getElementById('game-actions').innerHTML = `
-    <button class="btn btn-primary" onclick="openPokerSetup()">New Game</button>
-  `;
-  document.getElementById('game-area').innerHTML = `
-    <div style="text-align:center;padding:3rem;color:rgba(255,255,255,0.5)">
+window.leaveTable = function() {
+  if(window.saveCredits&&GAME) window.saveCredits(GAME.player.stack);
+  GAME=null;
+  document.getElementById('game-area').innerHTML=`
+    <div style="text-align:center;padding:3rem;color:rgba(255,255,255,0.35);flex-direction:column;display:flex;align-items:center;gap:0.75rem">
       <div style="font-size:3rem">♠</div>
-      <div style="margin-top:0.5rem">Start a new game to play</div>
-    </div>
-  `;
-  G = null;
+      <div>Start a game to play</div>
+      <button class="btn btn-accent" onclick="openPokerSetup()" style="margin-top:0.25rem">Start Game</button>
+    </div>`;
+  document.getElementById('game-actions').innerHTML='';
 };
 
-// ── Setup Modal ────────────────────────────────
+// ── Setup modal ─────────────────────────────────
 window.openPokerSetup = function() {
   document.getElementById('poker-setup-modal').classList.add('open');
+  updateBotSelectors();
+  const cm=document.getElementById('credits-display-modal');
+  if(cm) cm.textContent=(window.playerCredits||500)+' cr';
 };
 window.closePokerSetup = function() {
   document.getElementById('poker-setup-modal').classList.remove('open');
 };
-
 window.startGame = function() {
-  const count = parseInt(document.getElementById('bot-count').value||1);
-  const types = [];
-  for (let i=0;i<count;i++) {
-    const sel = document.getElementById(`bot-type-${i}`);
-    types.push(sel?sel.value:'TAG');
+  const count=parseInt(document.getElementById('bot-count')?.value||1);
+  const types=[];
+  for(let i=0;i<count;i++){
+    const s=document.getElementById('bot-type-'+i);
+    types.push(s?s.value:'TAG');
   }
   closePokerSetup();
-  const credits = window.playerCredits || 500;
-  const g = initGame(count, types);
-  g.player.stack = credits;
-  G = g;
-  renderGame();
-  setTimeout(()=>{G.waitingForPlayer=true;renderActions();},1400);
+  window.initGame(types);
 };
-
 window.updateBotSelectors = function() {
-  const count = parseInt(document.getElementById('bot-count').value||1);
-  const el = document.getElementById('bot-type-selectors');
-  if (!el) return;
-  el.innerHTML = Array.from({length:count},(_,i)=>`
+  const count=parseInt(document.getElementById('bot-count')?.value||1);
+  const el=document.getElementById('bot-type-selectors');
+  if(!el) return;
+  el.innerHTML=Array.from({length:count},(_,i)=>`
     <div style="margin-bottom:0.5rem">
-      <label style="font-size:0.8rem;color:var(--text-muted);display:block;margin-bottom:3px">Bot ${i+1} style</label>
-      <select id="bot-type-${i}" style="width:100%;padding:0.5rem;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg);font-family:var(--font-body);font-size:0.875rem">
+      <label style="font-size:0.8rem;color:var(--text-muted);display:block;margin-bottom:3px">Bot ${i+1} personality</label>
+      <select id="bot-type-${i}" style="width:100%;padding:0.5rem;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:0.875rem">
         <option value="TAG">🎯 TAG — Tight Aggressive</option>
         <option value="LAG">🔥 LAG — Loose Aggressive</option>
         <option value="Fish">🐟 Fish — Calling Station</option>
         <option value="Nit">🪨 Nit — Ultra Tight</option>
       </select>
-    </div>
-  `).join('');
+    </div>`).join('');
 };

@@ -100,3 +100,48 @@
   .dash-grid { grid-template-columns: repeat(2, 1fr); }
   .auth-bar { gap: 0.5rem; }
 }
+
+/* ── Profile Modal ── */
+.profile-modal {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.6); z-index: 300;
+  align-items: center; justify-content: center; padding: 1rem;
+}
+.profile-modal.open { display: flex; }
+.profile-inner {
+  background: var(--bg-card); border-radius: var(--radius-lg);
+  padding: 1.5rem; width: 100%; max-width: 420px;
+  box-shadow: var(--shadow-lg); max-height: 90vh; overflow-y: auto;
+}
+.profile-inner h2 { font-family: var(--font-display); font-size: 1.25rem; color: var(--felt); margin-bottom: 1.25rem; }
+.profile-field { margin-bottom: 1rem; }
+.profile-field label { font-size: 0.8rem; font-weight: 500; color: var(--text-muted); display: block; margin-bottom: 0.35rem; }
+.profile-field input[type=text],
+.profile-field select { width: 100%; padding: 0.6rem 0.75rem; border: 1px solid var(--border-strong); border-radius: var(--radius); font-family: var(--font-body); font-size: 0.9rem; background: var(--bg); color: var(--text); outline: none; transition: border-color 0.15s; }
+.profile-field input:focus, .profile-field select:focus { border-color: var(--accent); }
+.profile-field input[type=file] { font-size: 0.8rem; color: var(--text-muted); }
+.avatar-color-grid { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 0.35rem; }
+.avatar-color-btn:hover { transform: scale(1.15); }
+.profile-section-label { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light); margin: 1rem 0 0.5rem; }
+
+/* ── Lock overlay for certificate ── */
+.cert-lock-overlay {
+  position: absolute; inset: 0; background: rgba(26,46,26,0.85);
+  border-radius: var(--radius-lg); display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 0.75rem; z-index: 10;
+}
+.cert-preview-wrap { position: relative; }
+.cert-lock-icon { font-size: 2.5rem; }
+.cert-lock-text { font-size: 0.9rem; color: rgba(255,255,255,0.8); text-align: center; padding: 0 1.5rem; line-height: 1.5; }
+.cert-lock-progress { font-size: 0.8rem; color: var(--accent); font-weight: 500; }
+
+/* ── Profile button in topbar ── */
+.profile-btn {
+  display: flex; align-items: center; gap: 0.4rem;
+  padding: 0.3rem 0.6rem; border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.08); color: #fff;
+  cursor: pointer; font-family: var(--font-body); font-size: 0.78rem;
+  transition: background 0.15s; white-space: nowrap;
+}
+.profile-btn:hover { background: rgba(255,255,255,0.16); }
