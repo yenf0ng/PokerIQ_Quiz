@@ -6,6 +6,7 @@
 <title>PokerIQ — Texas Hold'em Mastery</title>
 <link rel="stylesheet" href="styles/main.css">
 <link rel="stylesheet" href="styles/auth.css">
+<link rel="stylesheet" href="styles/game.css">
 </head>
 <body>
 
@@ -65,6 +66,16 @@
       <button class="nav-item" data-section="glossary">
         <span class="nav-icon">📖</span><span class="nav-label">Glossary</span>
         <span class="nav-check" data-section="glossary"></span>
+      </button>
+      <div style="height:1px;background:var(--border);margin:0.5rem 0"></div>
+      <button class="nav-item" data-section="poker-table">
+        <span class="nav-icon">🃏</span><span class="nav-label">Play vs Bots</span>
+      </button>
+      <button class="nav-item" data-section="leaderboard">
+        <span class="nav-icon">🏆</span><span class="nav-label">Leaderboard</span>
+      </button>
+      <button class="nav-item" data-section="certificate">
+        <span class="nav-icon">🎓</span><span class="nav-label">Certificate</span>
       </button>
     </nav>
     <div class="sidebar-footer">PokerIQ · Free to learn · No signup needed</div>
@@ -920,7 +931,138 @@
       </div>
     </section>
 
+    <!-- ─── POKER TABLE ─── -->
+    <section class="section-page" id="sec-poker-table">
+      <div class="section-header">
+        <div class="section-eyebrow">♠ Bonus Feature</div>
+        <h1 class="section-title">Play vs Bots</h1>
+        <p class="section-intro">Practice Texas Hold'em against AI bots. Win credits, climb the leaderboard. Educational only — no real money.</p>
+      </div>
+      <div class="credits-display-bar">
+        <span>Your credits:</span>
+        <strong id="credits-display">500 cr</strong>
+        <button class="btn btn-secondary" style="margin-left:auto;padding:0.3rem 0.75rem;font-size:0.8rem" onclick="openPokerSetup()">New Game</button>
+      </div>
+      <div id="game-area" style="background:var(--felt);border-radius:16px;min-height:200px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.4);flex-direction:column;gap:0.5rem;padding:2rem">
+        <div style="font-size:3rem">♠</div>
+        <div style="font-size:0.9rem">Start a game to play</div>
+        <button class="btn btn-accent" style="margin-top:0.5rem" onclick="openPokerSetup()">Start Game</button>
+      </div>
+      <div id="game-actions" style="margin-top:1rem"></div>
+      <div class="info-box" style="margin-top:1.5rem">
+        <strong>How credits work:</strong> You start with 500 credits. Win hands to grow your stack. If you go broke, you get a 100 credit rebuy. Credits sync to the leaderboard when you're signed in.
+      </div>
+    </section>
+
+    <!-- ─── LEADERBOARD ─── -->
+    <section class="section-page" id="sec-leaderboard">
+      <div class="section-header">
+        <div class="section-eyebrow">♥ Global Rankings</div>
+        <h1 class="section-title">Leaderboard</h1>
+        <p class="section-intro">See how you rank against other PokerIQ players. Sign in to appear on the board.</p>
+      </div>
+      <div class="lb-refresh-bar">
+        <div class="score-formula">Score = (sections × 100) + (quiz × 10) + (credits ÷ 10)</div>
+        <div style="display:flex;gap:0.5rem">
+          <button class="btn btn-secondary" style="padding:0.4rem 0.75rem;font-size:0.8rem" onclick="openCountryPicker()">🌍 Set Country</button>
+          <button class="btn btn-secondary" style="padding:0.4rem 0.75rem;font-size:0.8rem" onclick="if(window._db)loadLeaderboard(window._db)">↺ Refresh</button>
+        </div>
+      </div>
+      <div class="lb-table-wrap">
+        <table class="lb-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Player</th>
+              <th>Country</th>
+              <th class="center">Sections</th>
+              <th class="center">Quiz</th>
+              <th>Credits</th>
+              <th>Score</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboard-body">
+            <tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--text-muted)">Sign in to view the leaderboard</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ─── CERTIFICATE ─── -->
+    <section class="section-page" id="sec-certificate">
+      <div class="section-header">
+        <div class="section-eyebrow">♦ Your Achievement</div>
+        <h1 class="section-title">Certificate</h1>
+        <p class="section-intro">Preview and download your PokerIQ certificate. Complete all 8 sections to earn the full certificate.</p>
+      </div>
+      <div class="card" style="margin-bottom:1.25rem">
+        <label style="font-size:0.8rem;font-weight:500;color:var(--text-muted);display:block;margin-bottom:0.5rem">Name on certificate</label>
+        <input type="text" class="cert-name-input" id="cert-name-input-preview" placeholder="Enter your name..." oninput="drawCertificate(this.value)" style="margin-bottom:1rem">
+        <canvas id="cert-canvas-preview" style="width:100%;border:1px solid var(--border);border-radius:var(--radius);display:block;margin-bottom:1rem"></canvas>
+        <div style="display:flex;gap:0.75rem;flex-wrap:wrap">
+          <button class="btn btn-accent" onclick="downloadCertPreview()">⬇ Download PNG</button>
+        </div>
+        <p style="font-size:0.75rem;color:var(--text-light);margin-top:0.75rem">Complete all 8 learning sections to get the official certificate with completion date.</p>
+      </div>
+    </section>
+
   </main>
+</div>
+
+<!-- ── Bottom Nav (mobile) ── -->
+<nav class="bottom-nav">
+  <div class="bottom-nav-inner">
+    <button class="bnav-item active" onclick="showSection('hand-rankings');setActiveNav(this)">
+      <i class="ti ti-book" aria-hidden="true"></i>Learn
+    </button>
+    <button class="bnav-item" onclick="showSection('poker-table');setActiveNav(this)">
+      <i class="ti ti-cards" aria-hidden="true"></i>Play
+    </button>
+    <button class="bnav-item" onclick="showSection('leaderboard');setActiveNav(this);if(window._db)loadLeaderboard(window._db)">
+      <i class="ti ti-trophy" aria-hidden="true"></i>Ranks
+    </button>
+    <button class="bnav-item" onclick="showSection('certificate');setActiveNav(this)">
+      <i class="ti ti-certificate" aria-hidden="true"></i>Cert
+    </button>
+    <button class="bnav-item" onclick="document.querySelector('.sidebar').classList.toggle('open');document.querySelector('.overlay').classList.toggle('open')">
+      <i class="ti ti-menu-2" aria-hidden="true"></i>Menu
+    </button>
+  </div>
+</nav>
+
+<!-- Poker Setup Modal -->
+<div class="poker-setup-modal" id="poker-setup-modal">
+  <div class="setup-inner">
+    <h2>🃏 Set Up Your Table</h2>
+    <div class="credits-display-bar">
+      <span>Your credits:</span>
+      <strong id="credits-display-modal">500 cr</strong>
+    </div>
+    <label style="font-size:0.8rem;font-weight:500;color:var(--text-muted);display:block;margin-bottom:0.35rem">Number of bots</label>
+    <select id="bot-count" onchange="updateBotSelectors()" style="width:100%;padding:0.6rem;border:1px solid var(--border-strong);border-radius:var(--radius);font-family:var(--font-body);font-size:0.9rem;background:var(--bg);color:var(--text);margin-bottom:1rem">
+      <option value="1">1 bot — Heads-up</option>
+      <option value="2">2 bots — 3-handed</option>
+      <option value="3" selected>3 bots — 4-handed</option>
+    </select>
+    <div id="bot-type-selectors"></div>
+    <div style="display:flex;gap:0.75rem;margin-top:1rem">
+      <button class="btn btn-primary" onclick="startGame()">Deal Cards</button>
+      <button class="btn btn-secondary" onclick="closePokerSetup()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Country Picker Modal -->
+<div class="country-modal" id="country-modal">
+  <div class="country-inner">
+    <h2 style="font-family:var(--font-display);font-size:1.2rem;color:var(--felt);margin-bottom:0.75rem">🌍 Set Your Country</h2>
+    <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:1rem">Your flag will show on the leaderboard.</p>
+    <select id="country-select" style="width:100%;padding:0.65rem;border:1px solid var(--border-strong);border-radius:var(--radius);font-family:var(--font-body);font-size:0.9rem;background:var(--bg);color:var(--text);margin-bottom:1rem"></select>
+    <div style="display:flex;gap:0.75rem">
+      <button class="btn btn-primary" onclick="saveCountry()">Save</button>
+      <button class="btn btn-secondary" onclick="closeCountryPicker()">Cancel</button>
+    </div>
+  </div>
 </div>
 
 <!-- Certificate Modal -->
@@ -928,28 +1070,67 @@
   <div class="cert-modal-inner">
     <h2>🏆 Your Certificate</h2>
     <p>Enter the name you want on the certificate, then download as PNG.</p>
-    <input
-      type="text"
-      class="cert-name-input"
-      id="cert-name-input"
-      placeholder="Enter your full name..."
-      oninput="drawCertificate(this.value)"
-    >
+    <input type="text" class="cert-name-input" id="cert-name-input" placeholder="Enter your full name..." oninput="drawCertificate(this.value)">
     <canvas id="cert-canvas"></canvas>
     <div class="cert-actions">
       <button class="btn btn-accent" onclick="downloadCertificate()">⬇ Download PNG</button>
       <button class="btn btn-secondary" onclick="closeCertModal()">Close</button>
     </div>
-    <p class="cert-sync-note">
-      <span class="sync-dot" id="cert-sync-dot"></span>
-      Certificate is generated locally — no data is uploaded.
-    </p>
+    <p class="cert-sync-note"><span class="sync-dot" id="cert-sync-dot"></span>Certificate is generated locally — no data is uploaded.</p>
   </div>
 </div>
 
 <script src="scripts/main.js"></script>
-<!-- firebase-config.js is in .gitignore — fill it from the template -->
-<script src="scripts/firebase-config.js" onerror="console.warn('firebase-config.js not found — copy from firebase-config.template.js and fill in your values')"></script>
+<script src="scripts/game.js"></script>
+<script src="scripts/leaderboard.js"></script>
+<script src="scripts/firebase-config.js" onerror="console.warn('firebase-config.js not found')"></script>
 <script type="module" src="scripts/auth.js"></script>
+<script>
+// ── Bottom nav active state ──
+function setActiveNav(el) {
+  document.querySelectorAll('.bnav-item').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+}
+// ── Certificate preview page ──
+window.downloadCertPreview = function() {
+  const canvas = document.getElementById('cert-canvas-preview');
+  if (!canvas) return;
+  const name = (document.getElementById('cert-name-input-preview')?.value||'PokerIQ_Certificate').trim().replace(/\s+/g,'_');
+  const link = document.createElement('a');
+  link.download = name+'_PokerIQ_Certificate.png';
+  link.href = canvas.toDataURL('image/png',1.0);
+  link.click();
+};
+// ── Init certificate preview canvas on section show ──
+const _origShow = window.showSection;
+window.showSection = function(id) {
+  _origShow(id);
+  if (id==='certificate') {
+    const canvas = document.getElementById('cert-canvas-preview');
+    const input  = document.getElementById('cert-name-input-preview');
+    if (canvas && typeof drawCertificate==='function') {
+      canvas.id = 'cert-canvas';
+      drawCertificate(input?.value||window.currentUserName||'Your Name');
+      canvas.id = 'cert-canvas-preview';
+    }
+  }
+  if (id==='leaderboard' && window._db) {
+    loadLeaderboard(window._db);
+  }
+  if (id==='poker-table') {
+    const cd = document.getElementById('credits-display');
+    if (cd) cd.textContent = (window.playerCredits||500).toLocaleString()+' cr';
+    updateBotSelectors();
+    buildCountrySelect();
+  }
+};
+// ── Init on load ──
+document.addEventListener('DOMContentLoaded', ()=>{
+  updateBotSelectors();
+  buildCountrySelect();
+  const cd = document.getElementById('credits-display');
+  if (cd) cd.textContent = (window.playerCredits||500).toLocaleString()+' cr';
+});
+</script>
 </body>
 </html>

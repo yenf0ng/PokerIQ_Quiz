@@ -46,10 +46,17 @@ if (isConfigured) {
 if (firebaseReady) {
   onAuthStateChanged(auth, async user => {
     currentUser = user;
+    window.currentUserId   = user?.uid || null;
+    window.currentUserName = user?.displayName || null;
+    window.currentUserPhoto = user?.photoURL || null;
+    window._db = db;
     renderAuthBar(user);
     if (user) {
       await syncProgressFromFirestore(user.uid);
       prefillCertName(user.displayName);
+      if (typeof window.pushLeaderboardScore === 'function') {
+        window.pushLeaderboardScore(db, user.uid, user);
+      }
     }
     checkCertEligibility();
   });
@@ -150,6 +157,9 @@ async function pushProgressToFirestore(uid) {
 window.onSectionMarkedComplete = async (sectionId) => {
   if (currentUser && firebaseReady) {
     await pushProgressToFirestore(currentUser.uid);
+    if (typeof window.pushLeaderboardScore === 'function') {
+      window.pushLeaderboardScore(db, currentUser.uid, currentUser);
+    }
   }
   checkCertEligibility();
 };
