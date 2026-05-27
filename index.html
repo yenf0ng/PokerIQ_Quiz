@@ -15,16 +15,16 @@
 <!-- ── Topbar ── -->
 <header class="topbar">
   <div class="topbar-left">
-    <button class="menu-toggle" aria-label="Menu" style="position: relative; z-index: 9999; cursor: pointer;">☰</button>
+    <button class="menu-toggle" aria-label="Menu">☰</button>
     <span class="topbar-logo">Poker<span>IQ</span> ♠</span>
   </div>
   <div class="topbar-progress">
     <div class="topbar-progress-bar"><div id="topbar-fill" class="topbar-progress-fill" style="width:0%"></div></div>
     <span id="topbar-pct" class="topbar-progress-pct">0%</span>
   </div>
-  <div class="topbar-right" style="display: flex; align-items: center; gap: 12px;">
-  <button class="auth-btn" style="background: transparent; border: 1px solid rgba(255,255,255,0.2); cursor: pointer;" onclick="document.getElementById('profile-modal').classList.add('open')" title="Edit Profile">⚙️ Profile</button>
-  <div id="auth-bar"></div>
+  <div class="topbar-right">
+    <button class="auth-btn" style="background:transparent;border:1px solid rgba(255,255,255,0.2);cursor:pointer;" onclick="document.getElementById('profile-modal').classList.add('open')">⚙️ Profile</button>
+    <div id="auth-bar"></div>
   </div>
 </header>
 
@@ -43,16 +43,15 @@
     <div class="nav-item" data-section="bankroll">📊 Bankroll Mgmt <span class="nav-check" data-section="bankroll"></span></div>
     <div class="nav-item" data-section="glossary">📖 Glossary <span class="nav-check" data-section="glossary"></span></div>
     <div style="height:1px;background:var(--border);margin:0.5rem 0.75rem"></div>
-    <div class="nav-item" data-section="poker-table">♠ Play vs Bots <span class="nav-check" data-section="bots"></span></div>
-    <div class="nav-item" data-section="leaderboard">🏆 Leaderboard <span class="nav-check" data-section="leaderboard"></span></div>
+    <div class="nav-item" data-section="poker-table">♠ Play vs Bots</div>
+    <div class="nav-item" data-section="leaderboard">🏆 Leaderboard</div>
     <div class="nav-item" data-section="certificate">🎓 Certificate</div>
   </nav>
 
-  <!-- ── Main ── -->
+  <!-- ── Main content ── -->
   <main class="content">
     <div id="progress-dashboard" class="progress-dashboard"></div>
 
-    <!-- cert unlock banner -->
     <div id="cert-banner" class="cert-banner">
       <div class="cert-banner-content">
         <span>🏆 <strong>Congratulations!</strong> You've completed all 8 sections!</span>
@@ -78,10 +77,7 @@
       <div class="hand-rank-item"><div class="hand-rank-num">8</div><div class="card-hand"><div class="playing-card red"><span class="rank">A♥</span><span class="suit-center">♥</span><span class="rank-bot">A♥</span></div><div class="playing-card"><span class="rank">A♠</span><span class="suit-center">♠</span><span class="rank-bot">A♠</span></div><div class="playing-card red"><span class="rank">5♦</span><span class="suit-center">♦</span><span class="rank-bot">5♦</span></div><div class="playing-card"><span class="rank">5♣</span><span class="suit-center">♣</span><span class="rank-bot">5♣</span></div><div class="playing-card"><span class="rank">J♠</span><span class="suit-center">♠</span><span class="rank-bot">J♠</span></div></div><div class="hand-rank-info"><div class="hand-rank-name">Two Pair</div><div class="hand-rank-desc">Two different pairs.</div></div></div>
       <div class="hand-rank-item"><div class="hand-rank-num">9</div><div class="card-hand"><div class="playing-card"><span class="rank">K♠</span><span class="suit-center">♠</span><span class="rank-bot">K♠</span></div><div class="playing-card red"><span class="rank">K♥</span><span class="suit-center">♥</span><span class="rank-bot">K♥</span></div><div class="playing-card"><span class="rank">7♣</span><span class="suit-center">♣</span><span class="rank-bot">7♣</span></div><div class="playing-card red"><span class="rank">3♦</span><span class="suit-center">♦</span><span class="rank-bot">3♦</span></div><div class="playing-card"><span class="rank">9♠</span><span class="suit-center">♠</span><span class="rank-bot">9♠</span></div></div><div class="hand-rank-info"><div class="hand-rank-name">One Pair</div><div class="hand-rank-desc">Two cards of the same rank.</div></div></div>
       <div class="hand-rank-item"><div class="hand-rank-num">10</div><div class="card-hand"><div class="playing-card"><span class="rank">A♠</span><span class="suit-center">♠</span><span class="rank-bot">A♠</span></div><div class="playing-card"><span class="rank">J♣</span><span class="suit-center">♣</span><span class="rank-bot">J♣</span></div><div class="playing-card red"><span class="rank">8♥</span><span class="suit-center">♥</span><span class="rank-bot">8♥</span></div><div class="playing-card red"><span class="rank">6♦</span><span class="suit-center">♦</span><span class="rank-bot">6♦</span></div><div class="playing-card"><span class="rank">2♣</span><span class="suit-center">♣</span><span class="rank-bot">2♣</span></div></div><div class="hand-rank-info"><div class="hand-rank-name">High Card</div><div class="hand-rank-desc">No combination. The highest card plays.</div></div></div>
-
       <div class="info-box"><strong>Memory tip:</strong> Royal → Str.Flush → Quads → Full House → Flush → Straight → Trips → Two Pair → Pair → High Card</div>
-
-      <!-- Hand tester -->
       <h2 style="font-family:var(--font-display);font-size:1.2rem;color:var(--felt);margin:2rem 0 0.75rem">Hand Strength Tester</h2>
       <div class="hand-tester">
         <h3>Can you name this hand?</h3>
@@ -100,7 +96,6 @@
         <div class="tester-result" id="tester-result"></div>
         <button class="btn btn-secondary" id="tester-deal" style="margin-top:0.75rem;background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.2);color:#fff">↺ New Hand</button>
       </div>
-
       <div class="quiz-wrap" id="quiz-hand-rankings">
         <div class="quiz-title">♠ Knowledge Check</div>
         <div class="quiz-progress-dots"></div>
@@ -110,9 +105,7 @@
         <div class="quiz-nav"></div>
         <div class="complete-banner">Score: <span class="score"></span></div>
       </div>
-      <div class="mark-complete-bar">
-        <button class="mark-complete-btn" data-section="hand-rankings">✓ Mark Complete</button>
-      </div>
+      <div class="mark-complete-bar"><button class="mark-complete-btn" data-section="hand-rankings">✓ Mark Complete</button></div>
     </section>
 
     <!-- ─── 2. PLAYSTYLE ─── -->
@@ -123,11 +116,11 @@
         <p class="section-intro">Every player falls into a style. Recognise yours — and your opponents' — to gain a huge edge.</p>
       </div>
       <div class="playstyle-card"><div class="playstyle-header"><span class="playstyle-badge playstyle-tag">TAG</span></div><div class="playstyle-body"><div class="playstyle-name">Tight Aggressive</div><div class="playstyle-desc">The gold standard for cash games. Selective hand choice, aggressive execution. Think sniper — wait for the right spot, then strike hard.</div><div class="pros-cons"><div class="pro-list"><div class="list-label">✓ Pros</div><ul><li>Strong long-term win rate</li><li>Easy to maintain consistently</li><li>Avoids marginal spots</li></ul></div><div class="con-list"><div class="list-label">✗ Cons</div><ul><li>Predictable to good players</li><li>Can be exploited by LAGs</li><li>Less action overall</li></ul></div></div></div></div>
-      <div class="playstyle-card"><div class="playstyle-header"><span class="playstyle-badge playstyle-lag">LAG</span></div><div class="playstyle-body"><div class="playstyle-name">Loose Aggressive</div><div class="playstyle-desc">Plays many hands with constant pressure. Highest ceiling — but requires excellent reads and emotional control. The best players in the world tend to be LAGs.</div><div class="pros-cons"><div class="pro-list"><div class="list-label">✓ Pros</div><ul><li>Highest potential win rate</li><li>Hard to put on a hand</li><li>Controls table dynamics</li></ul></div><div class="con-list"><div class="list-label">✗ Cons</div><ul><li>High variance</li><li>Easy to misexecute</li><li>Requires advanced reads</li></ul></div></div></div></div>
-      <div class="playstyle-card"><div class="playstyle-header"><span class="playstyle-badge playstyle-nit">NIT</span></div><div class="playstyle-body"><div class="playstyle-name">Nit (Tight Passive)</div><div class="playstyle-desc">Only plays premium hands, rarely bluffs. Exploitable — good players fold every time a Nit shows aggression, giving away the hand type.</div><div class="pros-cons"><div class="pro-list"><div class="list-label">✓ Pros</div><ul><li>Low risk of big losses</li><li>Strong hand selection</li></ul></div><div class="con-list"><div class="list-label">✗ Cons</div><ul><li>Very low win rate</li><li>Easily bluffed off pots</li><li>Misses profitable spots</li></ul></div></div></div></div>
+      <div class="playstyle-card"><div class="playstyle-header"><span class="playstyle-badge playstyle-lag">LAG</span></div><div class="playstyle-body"><div class="playstyle-name">Loose Aggressive</div><div class="playstyle-desc">Plays many hands with constant pressure. Highest ceiling — but requires excellent reads and emotional control.</div><div class="pros-cons"><div class="pro-list"><div class="list-label">✓ Pros</div><ul><li>Highest potential win rate</li><li>Hard to put on a hand</li><li>Controls table dynamics</li></ul></div><div class="con-list"><div class="list-label">✗ Cons</div><ul><li>High variance</li><li>Easy to misexecute</li><li>Requires advanced reads</li></ul></div></div></div></div>
+      <div class="playstyle-card"><div class="playstyle-header"><span class="playstyle-badge playstyle-nit">NIT</span></div><div class="playstyle-body"><div class="playstyle-name">Nit (Tight Passive)</div><div class="playstyle-desc">Only plays premium hands, rarely bluffs. Exploitable — good players fold every time a Nit shows aggression.</div><div class="pros-cons"><div class="pro-list"><div class="list-label">✓ Pros</div><ul><li>Low risk of big losses</li><li>Strong hand selection</li></ul></div><div class="con-list"><div class="list-label">✗ Cons</div><ul><li>Very low win rate</li><li>Easily bluffed off pots</li><li>Misses profitable spots</li></ul></div></div></div></div>
       <div class="playstyle-card"><div class="playstyle-header"><span class="playstyle-badge playstyle-fish">FISH</span></div><div class="playstyle-body"><div class="playstyle-name">Fish (Loose Passive)</div><div class="playstyle-desc">Plays too many hands, calls too often. The primary source of profit in most games. Don't be a Fish — but smile when you find one.</div><div class="pros-cons"><div class="pro-list"><div class="list-label">In theory</div><ul><li>Sees lots of flops</li><li>Low stress</li></ul></div><div class="con-list"><div class="list-label">✗ In practice</div><ul><li>Consistent long-term loser</li><li>Overpays for draws</li><li>No fold equity</li></ul></div></div></div></div>
-      <div class="playstyle-card"><div class="playstyle-header"><span class="playstyle-badge playstyle-gto">GTO</span></div><div class="playstyle-body"><div class="playstyle-name">GTO (Game Theory Optimal)</div><div class="playstyle-desc">A mathematically balanced strategy that cannot be exploited. Relevant at high-stakes or tournament play where opponents actively study imbalances.</div><div class="pros-cons"><div class="pro-list"><div class="list-label">✓ Pros</div><ul><li>Unexploitable baseline</li><li>Works vs all opponents</li></ul></div><div class="con-list"><div class="list-label">✗ Cons</div><ul><li>Complex to execute</li><li>Overkill vs bad players</li></ul></div></div></div></div>
-      <div class="tip-box"><strong>For casual players:</strong> Start with TAG. It's the most forgiving style, produces consistent results, and builds the discipline needed to add LAG elements later.</div>
+      <div class="playstyle-card"><div class="playstyle-header"><span class="playstyle-badge playstyle-gto">GTO</span></div><div class="playstyle-body"><div class="playstyle-name">GTO (Game Theory Optimal)</div><div class="playstyle-desc">A mathematically balanced strategy that cannot be exploited. Most relevant at high-stakes where opponents actively study imbalances.</div><div class="pros-cons"><div class="pro-list"><div class="list-label">✓ Pros</div><ul><li>Unexploitable baseline</li><li>Works vs all opponents</li></ul></div><div class="con-list"><div class="list-label">✗ Cons</div><ul><li>Complex to execute</li><li>Overkill vs bad players</li></ul></div></div></div></div>
+      <div class="tip-box"><strong>For casual players:</strong> Start with TAG. It's the most forgiving style and builds discipline needed to add LAG elements later.</div>
       <div class="quiz-wrap" id="quiz-playstyle"><div class="quiz-title">♥ Knowledge Check</div><div class="quiz-progress-dots"></div><div class="quiz-q"></div><div class="quiz-options"></div><div class="quiz-feedback"></div><div class="quiz-nav"></div><div class="complete-banner">Score: <span class="score"></span></div></div>
       <div class="mark-complete-bar"><button class="mark-complete-btn" data-section="playstyle">✓ Mark Complete</button></div>
     </section>
@@ -172,10 +165,10 @@
         <h1 class="section-title">Pot Odds &amp; Equity</h1>
         <p class="section-intro">The most important math in poker. Master this and you'll never make a fundamentally losing call again.</p>
       </div>
-      <div class="card"><h2 style="font-family:var(--font-display);font-size:1.2rem;color:var(--felt);margin-bottom:0.75rem">What Are Pot Odds?</h2><p style="font-size:0.9rem;color:var(--text-muted);line-height:1.7">Pot odds = the ratio of the call amount vs the total pot after your call. They tell you how often you need to win for the call to be profitable.</p><div class="info-box" style="margin-top:1rem"><strong>Formula:</strong> Pot Odds % = Call Amount ÷ (Pot + Call) × 100</div><p style="font-size:0.9rem;color:var(--text-muted);line-height:1.7;margin-top:0.75rem"><strong style="color:var(--felt)">Example:</strong> Pot $100, opponent bets $50. You call $50 into $150 total. Pot odds = 50/150 = 33%. You need to win 33%+ of the time to break even.</p></div>
+      <div class="card"><h2 style="font-family:var(--font-display);font-size:1.2rem;color:var(--felt);margin-bottom:0.75rem">What Are Pot Odds?</h2><p style="font-size:0.9rem;color:var(--text-muted);line-height:1.7">Pot odds = the ratio of the call amount vs the total pot after your call. They tell you how often you need to win for the call to be profitable.</p><div class="info-box" style="margin-top:1rem"><strong>Formula:</strong> Pot Odds % = Call Amount ÷ (Pot + Call) × 100</div><p style="font-size:0.9rem;color:var(--text-muted);line-height:1.7;margin-top:0.75rem"><strong style="color:var(--felt)">Example:</strong> Pot $100, opponent bets $50. You call $50 into $150 total. Pot odds = 50/150 = 33%. You need to win 33%+ to break even.</p></div>
       <div class="card" style="margin-top:1rem"><h2 style="font-family:var(--font-display);font-size:1.2rem;color:var(--felt);margin-bottom:0.75rem">Rule of 4 &amp; 2</h2><div class="grid-2"><div style="background:var(--bg);border-radius:var(--radius);padding:1rem"><div style="font-weight:600;font-size:0.85rem;color:var(--felt);margin-bottom:0.5rem">Common Draw Outs</div><table style="width:100%;font-size:0.8rem;border-collapse:collapse"><tr><td style="padding:3px 0;color:var(--text-muted)">Flush draw</td><td style="text-align:right;font-weight:500">9 outs</td></tr><tr><td style="padding:3px 0;color:var(--text-muted)">Open-ended straight</td><td style="text-align:right;font-weight:500">8 outs</td></tr><tr><td style="padding:3px 0;color:var(--text-muted)">Gutshot straight</td><td style="text-align:right;font-weight:500">4 outs</td></tr><tr><td style="padding:3px 0;color:var(--text-muted)">Two overcards</td><td style="text-align:right;font-weight:500">6 outs</td></tr></table></div><div style="background:var(--bg);border-radius:var(--radius);padding:1rem"><div style="font-weight:600;font-size:0.85rem;color:var(--felt);margin-bottom:0.5rem">Quick Formula</div><p style="font-size:0.8rem;color:var(--text-muted);line-height:1.6"><strong style="color:var(--felt)">On the flop:</strong> Outs × 4 ≈ equity %</p><p style="font-size:0.8rem;color:var(--text-muted);line-height:1.6;margin-top:0.4rem"><strong style="color:var(--felt)">On the turn:</strong> Outs × 2 ≈ equity %</p><p style="font-size:0.8rem;color:var(--text-muted);line-height:1.6;margin-top:0.4rem">Example: 9 outs flop → ~36%</p></div></div></div></div>
       <h2 style="font-family:var(--font-display);font-size:1.2rem;color:var(--felt);margin:1.5rem 0 1rem">Pot Odds Calculator</h2>
-<div class="pot-calc">
+      <div class="pot-calc">
         <div class="grid-2">
           <div><label>Pot size ($)</label><input type="number" id="pot-size" placeholder="e.g. 100" min="0"></div>
           <div><label>Opponent's bet ($)</label><input type="number" id="bet-size" placeholder="e.g. 50" min="0"></div>
@@ -192,26 +185,6 @@
       </div>
       <div class="quiz-wrap" id="quiz-pot-odds"><div class="quiz-title">♣ Knowledge Check</div><div class="quiz-progress-dots"></div><div class="quiz-q"></div><div class="quiz-options"></div><div class="quiz-feedback"></div><div class="quiz-nav"></div><div class="complete-banner">Score: <span class="score"></span></div></div>
       <div class="mark-complete-bar"><button class="mark-complete-btn" data-section="pot-odds">✓ Mark Complete</button></div>
-    </section>
-  <div class="quiz-wrap" id="quiz-pot-odds">
-    <div class="quiz-title">♣ Knowledge Check</div>
-    <div class="quiz-progress-dots">
-      <div class="q-dot current"></div><div class="q-dot "></div><div class="q-dot "></div><div class="q-dot "></div>
-    </div>
-    <div class="quiz-q">Q1: Pot is $100, opponent bets $50. What are your pot odds?</div>
-    <div class="quiz-options">
-      <button class="quiz-opt wrong disabled" onclick="submitAnswer('pot-odds',0)">25%</button>
-      <button class="quiz-opt correct disabled" onclick="submitAnswer('pot-odds',1)">33%</button>
-      <button class="quiz-opt disabled" onclick="submitAnswer('pot-odds',2)">50%</button>
-      <button class="quiz-opt disabled" onclick="submitAnswer('pot-odds',3)">66%</button>
-    </div>
-    <div class="quiz-feedback show">Pot is $150, call $50. 50/150 = 33%.</div>
-    <div class="quiz-nav">
-      <span style="font-size:0.8rem;color:var(--text-light)">1 of 4</span>
-      <button class="btn btn-primary" onclick="nextQuestion('pot-odds')">Next →</button>
-    </div>
-    <div class="complete-banner">Score: <span class="score"></span></div>
-  </div>
     </section>
 
     <!-- ─── 5. POSITIONS ─── -->
@@ -363,39 +336,8 @@
         <button class="btn btn-accent" id="cert-download-btn" onclick="downloadCertPreview()" disabled style="opacity:0.4">🔒 Complete all 8 sections to download</button>
       </div>
     </section>
-<section id="sec-leaderboard" class="section-page">
-        <h2>Global Leaderboard</h2>
-        <p style="color: var(--text-muted); margin-bottom: 1rem;">Compete with players worldwide. Scores are based on sections completed, quiz accuracy, and bot game credits.</p>
-        <div class="table-responsive">
-          <table class="leaderboard-table" style="width: 100%; border-collapse: collapse; text-align: left;">
-            <thead>
-              <tr style="border-bottom: 1px solid var(--border);">
-                <th style="padding: 0.5rem;">Rank</th>
-                <th style="padding: 0.5rem;">Player</th>
-                <th style="padding: 0.5rem;">Country</th>
-                <th style="padding: 0.5rem;">Sections</th>
-                <th style="padding: 0.5rem;">Quiz</th>
-                <th style="padding: 0.5rem;">Credits</th>
-                <th style="padding: 0.5rem;">Score</th>
-              </tr>
-            </thead>
-            <tbody id="leaderboard-body">
-              </tbody>
-          </table>
-        </div>
-      </section>
 
-      <section id="sec-bots" class="section-page">
-        <h2>Practice Arena: Play vs Bots</h2>
-        <p style="margin-bottom: 1rem;">Test your knowledge against automated TAG, LAG, and Fish personalities.</p>
-        <div id="game-area">
-          <div style="text-align:center; padding:3rem; color:rgba(255,255,255,0.5); background: var(--bg-card); border-radius: 8px;">
-            <div style="font-size:3rem; margin-bottom: 1rem;">♠</div>
-            <button class="btn btn-primary" onclick="openPokerSetup()">Sit Down & Deal Hand</button>
-          </div>
-        </div>
-        <div id="game-actions" style="margin-top:1rem;"></div>
-      </section>
+  </main>
 </div>
 
 <!-- Bottom nav (mobile) -->
@@ -410,7 +352,7 @@
 </nav>
 
 <!-- ── Modals ── -->
-  </main>
+
 <!-- Cert modal -->
 <div id="cert-modal" class="modal">
   <div class="modal-content certificate-modal-wrap">
@@ -519,17 +461,15 @@
 <script src="scripts/game.js"></script>
 <script src="scripts/leaderboard.js"></script>
 <script src="scripts/profile.js"></script>
-<script src="scripts/firebase-config.js" onerror="console.warn('firebase-config.js not found — run locally or check Netlify env vars')"></script>
+<script src="scripts/firebase-config.js" onerror="console.warn('firebase-config.js not found')"></script>
 <script type="module" src="scripts/auth.js"></script>
 
 <script>
-// ── Glue code ──
 function setActiveNav(el) {
   document.querySelectorAll('.bnav-item').forEach(b => b.classList.remove('active'));
   if (el) el.classList.add('active');
 }
 
-// Country picker (leaderboard page)
 window.openCountryPicker = function() {
   const saved = localStorage.getItem('pokeriq_country') || '';
   const sel = document.getElementById('country-select');
@@ -549,15 +489,13 @@ window.saveCountry = function() {
     if (window._db && typeof window.loadLeaderboard === 'function') window.loadLeaderboard(window._db);
   }
   closeCountryPicker();
-  if (typeof window.showToastMsg === 'function') window.showToastMsg('Country saved!');
+  if (typeof window.showToast === 'function') window.showToast('Country saved!');
 };
 
-// Certificate preview page
 window.previewCert = function(name) {
   const canvas = document.getElementById('cert-canvas-preview');
   if (!canvas || typeof drawCertificate !== 'function') return;
   const realCanvas = document.getElementById('cert-canvas');
-  // Temporarily swap id to reuse drawCertificate
   if (realCanvas) realCanvas.id = 'cert-canvas-tmp';
   canvas.id = 'cert-canvas';
   drawCertificate(name);
@@ -569,7 +507,7 @@ window.downloadCertPreview = function() {
   const p = JSON.parse(localStorage.getItem('pokeriq_progress')||'{}');
   const SECS = ['hand-rankings','playstyle','odds-calc','pot-odds','positions','bluffing','bankroll','glossary'];
   const done = SECS.filter(s => p[s]).length;
-  if (done < 8) { alert(`🔒 Complete all 8 sections first! (${done}/8 done)`); return; }
+  if (done < 8) { alert('🔒 Complete all 8 sections first! ('+done+'/8 done)'); return; }
   const canvas = document.getElementById('cert-canvas-preview');
   if (!canvas) return;
   const name = (document.getElementById('cert-name-preview')?.value || 'PokerIQ_Certificate').trim().replace(/\s+/g,'_');
@@ -579,7 +517,6 @@ window.downloadCertPreview = function() {
   link.click();
 };
 
-// Update cert page lock state
 function updateCertPageLock() {
   const p = JSON.parse(localStorage.getItem('pokeriq_progress')||'{}');
   const SECS = ['hand-rankings','playstyle','odds-calc','pot-odds','positions','bluffing','bankroll','glossary'];
@@ -592,12 +529,11 @@ function updateCertPageLock() {
     if (btn) { btn.disabled = false; btn.style.opacity = '1'; btn.textContent = '⬇ Download Certificate'; }
   } else {
     if (overlay) overlay.style.display = 'block';
-    if (progress) progress.textContent = `${done}/8 sections complete — ${8-done} remaining`;
-    if (btn) { btn.disabled = true; btn.style.opacity = '0.4'; btn.textContent = `🔒 Complete all 8 sections (${done}/8)`; }
+    if (progress) progress.textContent = done+'/8 sections complete — '+(8-done)+' remaining';
+    if (btn) { btn.disabled = true; btn.style.opacity = '0.4'; btn.textContent = '🔒 Complete all 8 sections ('+done+'/8)'; }
   }
 }
 
-// Hook into showSection to update cert lock and leaderboard
 const _baseShow = window.showSection;
 window.showSection = function(id) {
   _baseShow(id);
@@ -615,24 +551,20 @@ window.showSection = function(id) {
   }
 };
 
-// Init on load
 document.addEventListener('DOMContentLoaded', () => {
   updateBotSelectors();
   updateCertPageLock();
-  // Pre-fill profile modal
   document.querySelector('.profile-edit-trigger-btn')?.addEventListener('click', () => {
-    const savedName    = localStorage.getItem('pokeriq_display_name') || window.currentUserName || '';
+    const savedName = localStorage.getItem('pokeriq_display_name') || window.currentUserName || '';
     const savedCountry = localStorage.getItem('pokeriq_country') || 'Malaysia';
-    const nameIn  = document.getElementById('profile-name-input');
+    const nameIn = document.getElementById('profile-name-input');
     const countIn = document.getElementById('profile-country-select');
     if (nameIn && savedName) nameIn.value = savedName;
     if (countIn) countIn.value = savedCountry;
   });
-  // Close modals on backdrop click
   document.querySelectorAll('.modal').forEach(m => {
     m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
   });
-  // Credits display
   const cd = document.getElementById('credits-display');
   if (cd) cd.textContent = (window.playerCredits||500)+' cr';
 });
