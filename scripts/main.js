@@ -1,8 +1,7 @@
 // ══════════════════════════════════════════════
-//  PokerIQ — main.js (clean rebuild)
+//  PokerIQ — main.js
 // ══════════════════════════════════════════════
 
-// ── Constants ──────────────────────────────────
 const SECTIONS = ['hand-rankings','playstyle','odds-calc','pot-odds','positions','bluffing','bankroll','glossary'];
 
 // ── Progress ────────────────────────────────────
@@ -47,12 +46,12 @@ function showSection(id) {
 }
 window.showSection = showSection;
 
-// ── Cert modal open/close ───────────────────────
+// ── Cert modal ──────────────────────────────────
 window.openCertModal = function() {
   const p    = getProgress();
   const done = SECTIONS.filter(s => p[s]).length;
   if (done < SECTIONS.length) {
-    alert(`🔒 Complete all 8 sections first!\nDone: ${done}/8`);
+    alert('🔒 Certificate locked!\nComplete all 8 sections first.\nProgress: ' + done + '/8');
     return;
   }
   const modal = document.getElementById('cert-modal');
@@ -66,7 +65,7 @@ window.closeCertModal = function() {
   document.getElementById('cert-modal')?.classList.remove('open');
 };
 
-// ── Odds Calculator card utilities ─────────────
+// ── Odds Calculator ─────────────────────────────
 const CALC_RANKS = ['A','K','Q','J','T','9','8','7','6','5','4','3','2'];
 const CALC_SUITS = [['♠','black'],['♥','red'],['♦','red'],['♣','black']];
 const SUIT_NAMES = {'♠':'spades','♥':'hearts','♦':'diamonds','♣':'clubs'};
@@ -74,7 +73,7 @@ const SUIT_NAMES = {'♠':'spades','♥':'hearts','♦':'diamonds','♣':'clubs'
 function makeCardEl(rank, suit, color) {
   const d = document.createElement('div');
   d.className = 'playing-card' + (color === 'red' ? ' red' : '');
-  d.innerHTML = `<span class="rank">${rank}${suit}</span><span class="suit-center">${suit}</span><span class="rank-bot">${rank}${suit}</span>`;
+  d.innerHTML = '<span class="rank">'+rank+suit+'</span><span class="suit-center">'+suit+'</span><span class="rank-bot">'+rank+suit+'</span>';
   return d;
 }
 
@@ -84,9 +83,7 @@ function initOddsCalc() {
   const holePicker  = document.getElementById('hole-picker');
   const boardPicker = document.getElementById('board-picker');
   if (!holePicker) return;
-  const slotDefs = [
-    {id:'hole1'},{id:'hole2'},{id:'flop1'},{id:'flop2'},{id:'flop3'},{id:'turn'},{id:'river'}
-  ];
+  const slotDefs = [{id:'hole1'},{id:'hole2'},{id:'flop1'},{id:'flop2'},{id:'flop3'},{id:'turn'},{id:'river'}];
   slotDefs.forEach(def => {
     const slot = document.createElement('div');
     slot.className = 'card-picker-slot';
@@ -111,13 +108,13 @@ function openCardModal(slotId, slotEl) {
   CALC_SUITS.forEach(([suit, color]) => {
     const sec = document.createElement('div');
     sec.className = 'suit-section';
-    sec.innerHTML = `<div class="suit-label" style="color:${color==='red'?'var(--red)':'var(--text)'}">${suit} ${SUIT_NAMES[suit]}</div><div class="rank-buttons" id="rb-${suit}"></div>`;
+    sec.innerHTML = '<div class="suit-label" style="color:'+(color==='red'?'var(--red)':'var(--text)')+'">'+suit+' '+SUIT_NAMES[suit]+'</div><div class="rank-buttons" id="rb-'+suit+'"></div>';
     grid.appendChild(sec);
     const rb = sec.querySelector('.rank-buttons');
     CALC_RANKS.forEach(rank => {
       const key = rank + suit;
       const btn = document.createElement('button');
-      btn.className = 'rank-btn' + (color === 'red' ? ' red-suit' : '') + (pickedCards[key] ? ' used' : '');
+      btn.className = 'rank-btn' + (color==='red'?' red-suit':'') + (pickedCards[key]?' used':'');
       btn.textContent = rank; btn.disabled = !!pickedCards[key];
       btn.addEventListener('click', () => selectCalcCard(rank, suit, color, key));
       rb.appendChild(btn);
@@ -148,20 +145,19 @@ function clearCalc() {
   if (res) res.style.display = 'none';
 }
 
-function internalBuildDeck() {
+function buildDeckStr() {
   const d = [];
-  CALC_SUITS.forEach(([s]) => CALC_RANKS.forEach(r => d.push(r + s)));
+  CALC_SUITS.forEach(([s]) => CALC_RANKS.forEach(r => d.push(r+s)));
   return d;
 }
 
 function calcHandScore(cards) {
   const rs = cards.map(c => c.slice(0,-1));
   const ss = cards.map(c => c.slice(-1));
-  const rankIdx = r => 'A23456789TJQK'.indexOf(r) === 0 ? 12 : '23456789TJQKA'.indexOf(r);
   const vs = rs.map(r => '23456789TJQKA'.indexOf(r)).sort((a,b) => b-a);
-  const flush = ss.every(s => s === ss[0]);
-  const straight = vs.every((v,i) => i===0 || vs[i-1]-v===1) ||
-    (vs[0]===12 && vs[1]===3 && vs[2]===2 && vs[3]===1 && vs[4]===0);
+  const flush = ss.every(s => s===ss[0]);
+  const straight = vs.every((v,i) => i===0||vs[i-1]-v===1) ||
+    (vs[0]===12&&vs[1]===3&&vs[2]===2&&vs[3]===1&&vs[4]===0);
   const counts = {}; rs.forEach(r => counts[r]=(counts[r]||0)+1);
   const cv = Object.values(counts).sort((a,b) => b-a);
   if (flush&&straight&&vs[0]===12) return 9;
@@ -176,7 +172,7 @@ function calcHandScore(cards) {
   return 0;
 }
 
-function bestOf7str(cards) {
+function bestOf7(cards) {
   let best = -1;
   for (let i=0;i<7;i++) for (let j=i+1;j<7;j++) {
     const five = cards.filter((_,k) => k!==i&&k!==j);
@@ -186,55 +182,41 @@ function bestOf7str(cards) {
 }
 
 function mcShuffle(arr) {
-  const a = [...arr];
-  for (let i=a.length-1;i>0;i--) { const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
   return a;
 }
 
 function monteCarloEquity(hole, board, sims) {
-  const deck = internalBuildDeck().filter(c => ![...hole,...board].includes(c));
+  const deck = buildDeckStr().filter(c => ![...hole,...board].includes(c));
   let win=0,tie=0,lose=0;
-  const needed = 5 - board.length;
-  for (let i=0;i<sims;i++) {
-    const sh = mcShuffle(deck);
-    const comm = [...board, ...sh.slice(0, needed)];
-    const opp  = sh.slice(needed, needed+2);
-    const h = [...hole,...comm], v = [...opp,...comm];
-    const hs = h.length>=7 ? bestOf7str(h) : calcHandScore(h.slice(0,5));
-    const vs2 = v.length>=7 ? bestOf7str(v) : calcHandScore(v.slice(0,5));
-    if (hs>vs2) win++; else if (hs===vs2) tie++; else lose++;
+  const needed = 5-board.length;
+  for(let i=0;i<sims;i++){
+    const sh=mcShuffle(deck);
+    const comm=[...board,...sh.slice(0,needed)];
+    const opp=sh.slice(needed,needed+2);
+    const h=[...hole,...comm],v=[...opp,...comm];
+    const hs=h.length>=7?bestOf7(h):calcHandScore(h.slice(0,5));
+    const vs2=v.length>=7?bestOf7(v):calcHandScore(v.slice(0,5));
+    if(hs>vs2)win++;else if(hs===vs2)tie++;else lose++;
   }
-  return {win:(win/sims)*100, tie:(tie/sims)*100, lose:(lose/sims)*100};
-}
-
-function estimateOuts(hole, board) {
-  if (board.length < 3) return 0;
-  const all = [...hole,...board];
-  const suits = {}, ranks = {};
-  all.forEach(c => { const s=c.slice(-1), r=c.slice(0,-1); suits[s]=(suits[s]||0)+1; ranks[r]=(ranks[r]||0)+1; });
-  let outs = 0;
-  Object.values(suits).forEach(n => { if (n===4) outs+=9; });
-  Object.values(ranks).forEach(n => { if (n===3) outs+=1; if (n===2) outs+=2; });
-  return Math.min(outs, 21);
+  return {win:(win/sims)*100,tie:(tie/sims)*100,lose:(lose/sims)*100};
 }
 
 function calculateOdds() {
-  const hole = [slotCards['hole1'], slotCards['hole2']].filter(Boolean);
-  if (hole.length < 2) { alert('Select both hole cards first.'); return; }
-  const board = ['flop1','flop2','flop3','turn','river'].map(k => slotCards[k]).filter(Boolean);
-  const result = monteCarloEquity(hole, board, 5000);
-  const res = document.getElementById('odds-result');
-  if (res) res.style.display = 'block';
-  document.getElementById('equity-pct').textContent = result.win.toFixed(1)+'%';
-  document.getElementById('tie-pct').textContent    = result.tie.toFixed(1)+'%';
-  document.getElementById('lose-pct').textContent   = result.lose.toFixed(1)+'%';
-  ['win','tie','lose'].forEach(k => {
-    const b = document.getElementById(k+'-bar');
-    if (b) b.style.width = result[k].toFixed(1)+'%';
+  const hole=[slotCards['hole1'],slotCards['hole2']].filter(Boolean);
+  if(hole.length<2){alert('Select both hole cards first.');return;}
+  const board=['flop1','flop2','flop3','turn','river'].map(k=>slotCards[k]).filter(Boolean);
+  const result=monteCarloEquity(hole,board,5000);
+  const res=document.getElementById('odds-result');
+  if(res)res.style.display='block';
+  document.getElementById('equity-pct').textContent=result.win.toFixed(1)+'%';
+  document.getElementById('tie-pct') && (document.getElementById('tie-pct').textContent=result.tie.toFixed(1)+'%');
+  document.getElementById('lose-pct') && (document.getElementById('lose-pct').textContent=result.lose.toFixed(1)+'%');
+  ['win','tie','lose'].forEach(k=>{
+    const b=document.getElementById(k+'-bar');
+    if(b)b.style.width=result[k].toFixed(1)+'%';
   });
-  const outs = estimateOuts(hole, board);
-  const info = document.getElementById('outs-info');
-  if (info) info.textContent = outs > 0 ? `~${outs} outs` : (board.length>=5?'Final board':'');
 }
 
 // ── Pot Odds ────────────────────────────────────
@@ -244,22 +226,22 @@ function initPotOdds() {
   });
 }
 function calcPotOdds() {
-  const pot   = parseFloat(document.getElementById('pot-size')?.value)||0;
-  const bet   = parseFloat(document.getElementById('bet-size')?.value)||0;
-  const outs  = parseInt(document.getElementById('outs-input')?.value)||0;
-  if (!pot||!bet) return;
-  const potOdds = (bet/(pot+bet))*100;
-  const equity  = outs>0 ? (outs/47)*100 : 0;
-  const podEl   = document.getElementById('pot-odds-result');
-  const eqEl    = document.getElementById('equity-result');
-  const decEl   = document.getElementById('decision-result');
-  if (podEl) podEl.textContent = potOdds.toFixed(1)+'%';
-  if (eqEl)  eqEl.textContent  = outs>0 ? equity.toFixed(1)+'%' : '—';
-  if (decEl && outs>0) {
-    decEl.style.display = 'inline-block';
-    if (equity>potOdds)        { decEl.textContent='✓ Profitable call'; decEl.className='decision-badge decision-call'; }
-    else if (equity>potOdds*0.8){ decEl.textContent='⚠ Borderline'; decEl.className='decision-badge decision-close'; }
-    else                        { decEl.textContent='✗ Fold is better'; decEl.className='decision-badge decision-fold'; }
+  const pot  = parseFloat(document.getElementById('pot-size')?.value)||0;
+  const bet  = parseFloat(document.getElementById('bet-size')?.value)||0;
+  const outs = parseInt(document.getElementById('outs-input')?.value)||0;
+  if(!pot||!bet) return;
+  const potOdds=(bet/(pot+bet))*100;
+  const equity=outs>0?(outs/47)*100:0;
+  const podEl=document.getElementById('pot-odds-result');
+  const eqEl=document.getElementById('equity-result');
+  const decEl=document.getElementById('decision-result');
+  if(podEl)podEl.textContent=potOdds.toFixed(1)+'%';
+  if(eqEl)eqEl.textContent=outs>0?equity.toFixed(1)+'%':'—';
+  if(decEl&&outs>0){
+    decEl.style.display='inline-block';
+    if(equity>potOdds){decEl.textContent='✓ Profitable call';decEl.className='decision-badge decision-call';}
+    else if(equity>potOdds*0.8){decEl.textContent='⚠ Borderline';decEl.className='decision-badge decision-close';}
+    else{decEl.textContent='✗ Fold is better';decEl.className='decision-badge decision-fold';}
   }
 }
 
@@ -268,21 +250,21 @@ function initBankroll() {
   document.getElementById('bankroll-input')?.addEventListener('input', calcBankroll);
 }
 function calcBankroll() {
-  const br = parseFloat(document.getElementById('bankroll-input')?.value)||0;
-  document.querySelectorAll('.stake-row').forEach(row => {
-    const needed = (parseFloat(row.dataset.buyin)||0)*20;
-    row.style.background = br>=needed ? 'rgba(42,122,42,0.06)' : '';
-    const badge = row.querySelector('.ready-badge');
-    if (badge) { badge.textContent = br>=needed?'✓ Ready':''; badge.style.color='#2a7a2a'; }
+  const br=parseFloat(document.getElementById('bankroll-input')?.value)||0;
+  document.querySelectorAll('.stake-row').forEach(row=>{
+    const needed=(parseFloat(row.dataset.buyin)||0)*20;
+    row.style.background=br>=needed?'rgba(42,122,42,0.06)':'';
+    const badge=row.querySelector('.ready-badge');
+    if(badge){badge.textContent=br>=needed?'✓ Ready':'';badge.style.color='#2a7a2a';}
   });
 }
 
 // ── Positions ───────────────────────────────────
 function initPositions() {
-  document.querySelectorAll('.pos-card').forEach(card => {
-    card.addEventListener('click', () => {
-      document.querySelectorAll('.pos-card').forEach(c => c.classList.remove('active'));
-      document.querySelectorAll('.pos-detail').forEach(d => d.classList.remove('active'));
+  document.querySelectorAll('.pos-card').forEach(card=>{
+    card.addEventListener('click',()=>{
+      document.querySelectorAll('.pos-card').forEach(c=>c.classList.remove('active'));
+      document.querySelectorAll('.pos-detail').forEach(d=>d.classList.remove('active'));
       card.classList.add('active');
       document.getElementById('pos-'+card.dataset.pos)?.classList.add('active');
     });
@@ -291,15 +273,15 @@ function initPositions() {
 
 // ── Glossary ────────────────────────────────────
 function initGlossary() {
-  const search = document.getElementById('glossary-search');
-  if (!search) return;
-  search.addEventListener('input', () => {
-    const q = search.value.toLowerCase();
-    document.querySelectorAll('.glossary-term').forEach(t => t.classList.toggle('hidden', q.length>0 && !t.textContent.toLowerCase().includes(q)));
-    document.querySelectorAll('.glossary-letter').forEach(letter => {
-      let el = letter.nextElementSibling, allHidden = true;
-      while (el && el.classList.contains('glossary-term')) { if (!el.classList.contains('hidden')) allHidden=false; el=el.nextElementSibling; }
-      letter.style.display = allHidden ? 'none' : '';
+  const search=document.getElementById('glossary-search');
+  if(!search)return;
+  search.addEventListener('input',()=>{
+    const q=search.value.toLowerCase();
+    document.querySelectorAll('.glossary-term').forEach(t=>t.classList.toggle('hidden',q.length>0&&!t.textContent.toLowerCase().includes(q)));
+    document.querySelectorAll('.glossary-letter').forEach(letter=>{
+      let el=letter.nextElementSibling,allHidden=true;
+      while(el&&el.classList.contains('glossary-term')){if(!el.classList.contains('hidden'))allHidden=false;el=el.nextElementSibling;}
+      letter.style.display=allHidden?'none':'';
     });
   });
 }
@@ -315,7 +297,7 @@ const quizData = {
   'playstyle': [
     {q:'What does TAG stand for?',opts:['Tight Aggressive','Tight And Good','Total Ace Game','Turn And Go'],ans:0,exp:'TAG = Tight Aggressive. Play few hands, but bet and raise aggressively with strong ones.'},
     {q:'Which playstyle plays many hands but bets aggressively?',opts:['Nit','TAG','LAG','Fish'],ans:2,exp:'LAG (Loose Aggressive) plays many hands and uses aggression to pressure opponents.'},
-    {q:'A "Nit" in poker is best described as:',opts:['A very loose player','An extremely tight, passive player','A bluffing specialist','A GTO solver'],ans:1,exp:'Nits play very few hands and rarely bluff.'},
+    {q:'A "Nit" in poker is best described as:',opts:['A very loose player','An extremely tight passive player','A bluffing specialist','A GTO solver'],ans:1,exp:'Nits play very few hands and rarely bluff.'},
     {q:'What does GTO stand for?',opts:['Get The Odds','Game Theory Optimal','Good Turn Only','Guess The Opponent'],ans:1,exp:'GTO = Game Theory Optimal. A mathematically balanced strategy.'},
   ],
   'odds-calc': [
@@ -357,146 +339,115 @@ const quizData = {
 };
 
 const quizState = {};
-
 function initQuiz(sectionId) {
-  const questions = quizData[sectionId];
-  if (!questions) return;
+  if (!quizData[sectionId]) return;
   quizState[sectionId] = {current:0, answers:{}, submitted:{}};
   renderQuestion(sectionId);
 }
-
 function renderQuestion(sectionId) {
-  const state = quizState[sectionId];
-  const questions = quizData[sectionId];
-  const q = questions[state.current];
-  const wrap = document.getElementById('quiz-'+sectionId);
-  if (!wrap || !q) return;
-  wrap.querySelector('.quiz-progress-dots').innerHTML = questions.map((_,i) =>
-    `<div class="q-dot ${i<state.current?'done':i===state.current?'current':''}"></div>`).join('');
-  wrap.querySelector('.quiz-q').textContent = `Q${state.current+1}: ${q.q}`;
-  wrap.querySelector('.quiz-options').innerHTML = q.opts.map((opt,i) =>
-    `<button class="quiz-opt${state.submitted[state.current]?(i===q.ans?' correct':state.answers[state.current]===i?' wrong':'')+' disabled':''}" onclick="submitAnswer('${sectionId}',${i})">${opt}</button>`
+  const state=quizState[sectionId];
+  const questions=quizData[sectionId];
+  const q=questions[state.current];
+  const wrap=document.getElementById('quiz-'+sectionId);
+  if(!wrap||!q)return;
+  wrap.querySelector('.quiz-progress-dots').innerHTML=questions.map((_,i)=>
+    '<div class="q-dot '+(i<state.current?'done':i===state.current?'current':'')+'"></div>').join('');
+  wrap.querySelector('.quiz-q').textContent='Q'+(state.current+1)+': '+q.q;
+  wrap.querySelector('.quiz-options').innerHTML=q.opts.map((opt,i)=>
+    '<button class="quiz-opt'+(state.submitted[state.current]?(i===q.ans?' correct':state.answers[state.current]===i?' wrong':'')+' disabled':'')+'" onclick="submitAnswer(\''+sectionId+'\','+i+')">'+opt+'</button>'
   ).join('');
-  const fb = wrap.querySelector('.quiz-feedback');
-  fb.textContent = q.exp; fb.classList.toggle('show', !!state.submitted[state.current]);
-  const isLast = state.current === questions.length-1;
-  const canNext = !!state.submitted[state.current];
-  const banner = wrap.querySelector('.complete-banner');
-  if (banner) banner.classList.remove('show');
-  wrap.querySelector('.quiz-nav').innerHTML = `
-    <span style="font-size:0.8rem;color:var(--text-light)">${state.current+1} of ${questions.length}</span>
-    ${canNext&&!isLast ? `<button class="btn btn-primary" onclick="nextQuestion('${sectionId}')">Next →</button>` : ''}
-    ${canNext&&isLast  ? `<button class="btn btn-accent" onclick="showScore('${sectionId}')">See Results</button>` : ''}
-  `;
+  const fb=wrap.querySelector('.quiz-feedback');
+  fb.textContent=q.exp; fb.classList.toggle('show',!!state.submitted[state.current]);
+  const isLast=state.current===questions.length-1;
+  const canNext=!!state.submitted[state.current];
+  const banner=wrap.querySelector('.complete-banner');
+  if(banner)banner.classList.remove('show');
+  wrap.querySelector('.quiz-nav').innerHTML=
+    '<span style="font-size:0.8rem;color:var(--text-light)">'+(state.current+1)+' of '+questions.length+'</span>'+
+    (canNext&&!isLast?'<button class="btn btn-primary" onclick="nextQuestion(\''+sectionId+'\')">Next →</button>':'')+
+    (canNext&&isLast?'<button class="btn btn-accent" onclick="showScore(\''+sectionId+'\')">See Results</button>':'');
 }
-
 function submitAnswer(sectionId, idx) {
-  const state = quizState[sectionId];
-  if (state.submitted[state.current]) return;
-  state.answers[state.current] = idx;
-  state.submitted[state.current] = true;
+  const state=quizState[sectionId];
+  if(state.submitted[state.current])return;
+  state.answers[state.current]=idx;
+  state.submitted[state.current]=true;
   renderQuestion(sectionId);
 }
 function nextQuestion(sectionId) { quizState[sectionId].current++; renderQuestion(sectionId); }
 function showScore(sectionId) {
-  const state = quizState[sectionId];
-  const questions = quizData[sectionId];
-  const correct = questions.filter((q,i) => state.answers[i]===q.ans).length;
-  const wrap = document.getElementById('quiz-'+sectionId);
-  const banner = wrap.querySelector('.complete-banner');
-  wrap.querySelector('.score').textContent = correct+'/'+questions.length;
-  if (banner) banner.classList.add('show');
-  wrap.querySelector('.quiz-nav').innerHTML = `
-    <button class="btn btn-secondary" onclick="restartQuiz('${sectionId}')">↺ Retry</button>
-    <span style="font-size:0.8rem;color:var(--text-muted)">${correct===questions.length?'🏆 Perfect!':correct>=questions.length/2?'Good job!':'Keep studying!'}</span>
-  `;
-  if (typeof window.addQuizScore === 'function') window.addQuizScore(correct);
+  const state=quizState[sectionId];
+  const questions=quizData[sectionId];
+  const correct=questions.filter((q,i)=>state.answers[i]===q.ans).length;
+  const wrap=document.getElementById('quiz-'+sectionId);
+  const banner=wrap.querySelector('.complete-banner');
+  wrap.querySelector('.score').textContent=correct+'/'+questions.length;
+  if(banner)banner.classList.add('show');
+  wrap.querySelector('.quiz-nav').innerHTML=
+    '<button class="btn btn-secondary" onclick="restartQuiz(\''+sectionId+'\')">↺ Retry</button>'+
+    '<span style="font-size:0.8rem;color:var(--text-muted)">'+(correct===questions.length?'🏆 Perfect!':correct>=questions.length/2?'Good job!':'Keep studying!')+'</span>';
+  if(typeof window.addQuizScore==='function')window.addQuizScore(correct);
 }
 function restartQuiz(sectionId) {
-  quizState[sectionId] = {current:0, answers:{}, submitted:{}};
+  quizState[sectionId]={current:0,answers:{},submitted:{}};
   renderQuestion(sectionId);
 }
-window.submitAnswer = submitAnswer;
-window.nextQuestion = nextQuestion;
-window.showScore    = showScore;
-window.restartQuiz  = restartQuiz;
+window.submitAnswer=submitAnswer;
+window.nextQuestion=nextQuestion;
+window.showScore=showScore;
+window.restartQuiz=restartQuiz;
 
 // ── Hand Tester ─────────────────────────────────
-const HAND_TYPES = ['High Card','One Pair','Two Pair','Three of a Kind','Straight','Flush','Full House','Four of a Kind','Straight Flush'];
-let testerCards = [];
-
+const HAND_TYPES=['High Card','One Pair','Two Pair','Three of a Kind','Straight','Flush','Full House','Four of a Kind','Straight Flush'];
+let testerCards=[];
 function initHandTester() {
   dealTesterHand();
-  document.getElementById('tester-deal')?.addEventListener('click', dealTesterHand);
+  document.getElementById('tester-deal')?.addEventListener('click',dealTesterHand);
 }
 function dealTesterHand() {
-  const deck = mcShuffle(internalBuildDeck());
-  testerCards = deck.slice(0,5);
-  const container = document.getElementById('tester-cards');
-  if (!container) return;
-  container.innerHTML = '';
-  testerCards.forEach(c => {
-    const rank=c.slice(0,-1), suit=c.slice(-1);
-    container.appendChild(makeCardEl(rank, suit, (suit==='♥'||suit==='♦')?'red':'black'));
+  const deck=mcShuffle(buildDeckStr());
+  testerCards=deck.slice(0,5);
+  const container=document.getElementById('tester-cards');
+  if(!container)return;
+  container.innerHTML='';
+  testerCards.forEach(c=>{
+    const rank=c.slice(0,-1),suit=c.slice(-1);
+    container.appendChild(makeCardEl(rank,suit,(suit==='♥'||suit==='♦')?'red':'black'));
   });
-  document.querySelectorAll('.guess-btn').forEach(b => { b.classList.remove('correct','wrong'); b.disabled=false; });
+  document.querySelectorAll('.guess-btn').forEach(b=>{b.classList.remove('correct','wrong');b.disabled=false;});
   document.getElementById('tester-result')?.classList.remove('show');
 }
-window.guessHand = function(idx) {
-  const score = calcHandScore(testerCards);
-  document.querySelectorAll('.guess-btn').forEach((b,i) => {
-    b.disabled = true;
-    if (i===score) b.classList.add('correct');
-    else if (i===idx&&idx!==score) b.classList.add('wrong');
+window.guessHand=function(idx){
+  const score=calcHandScore(testerCards);
+  document.querySelectorAll('.guess-btn').forEach((b,i)=>{
+    b.disabled=true;
+    if(i===score)b.classList.add('correct');
+    else if(i===idx&&idx!==score)b.classList.add('wrong');
   });
-  const res = document.getElementById('tester-result');
-  if (res) {
-    res.classList.add('show');
-    res.innerHTML = `<div class="tester-result-name">${idx===score?'✓ Correct! ':'✗ Wrong — it\'s a '}${HAND_TYPES[score]}</div>`;
-  }
+  const res=document.getElementById('tester-result');
+  if(res){res.classList.add('show');res.innerHTML='<div class="tester-result-name">'+(idx===score?'✓ Correct! ':'✗ Wrong — it\'s a ')+HAND_TYPES[score]+'</div>';}
 };
 
 // ── Profile modal wiring ────────────────────────
 function initProfileModal() {
-  document.getElementById('save-profile-changes')?.addEventListener('click', () => {
-    const name    = document.getElementById('profile-name-input')?.value?.trim();
-    const avatar  = document.getElementById('profile-avatar-input')?.value?.trim();
-    const country = document.getElementById('profile-country-select')?.value;
-    if (typeof window.updateUserProfileData === 'function') {
-      window.updateUserProfileData(name, avatar, country);
+  document.getElementById('save-profile-changes')?.addEventListener('click',()=>{
+    const name=document.getElementById('profile-name-input')?.value?.trim();
+    const avatar=document.getElementById('profile-avatar-input')?.value?.trim();
+    const country=document.getElementById('profile-country-select')?.value;
+    if(typeof window.updateUserProfileData==='function'){
+      window.updateUserProfileData(name,avatar,country);
     } else {
-      if (country) localStorage.setItem('pokeriq_country', country);
-      if (name)    localStorage.setItem('pokeriq_display_name', name);
-      showToastMsg('Profile saved locally.');
+      if(country)localStorage.setItem('pokeriq_country',country);
+      if(name)localStorage.setItem('pokeriq_display_name',name);
       document.getElementById('profile-modal')?.classList.remove('open');
+      if(typeof window.showToast==='function')window.showToast('Profile saved!');
     }
   });
-  // Pre-fill saved country on open
-  document.querySelector('.profile-edit-trigger-btn')?.addEventListener('click', () => {
-    const saved = localStorage.getItem('pokeriq_country');
-    const sel   = document.getElementById('profile-country-select');
-    if (saved && sel) sel.value = saved;
-    const savedName = localStorage.getItem('pokeriq_display_name') || window.currentUserName || '';
-    const nameInput = document.getElementById('profile-name-input');
-    if (nameInput && savedName) nameInput.value = savedName;
-  });
 }
-
-function showToastMsg(msg) {
-  let t = document.getElementById('toast-msg');
-  if (!t) {
-    t = document.createElement('div');
-    t.id = 'toast-msg';
-    t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a2e1a;color:#c9a84c;padding:0.5rem 1.25rem;border-radius:20px;font-size:0.85rem;font-weight:500;z-index:500;opacity:0;transition:opacity 0.25s;pointer-events:none';
-    document.body.appendChild(t);
-  }
-  t.textContent = msg; t.style.opacity = '1';
-  setTimeout(() => t.style.opacity = '0', 2200);
-}
-window.showToastMsg = showToastMsg;
 
 // ── DOMContentLoaded ────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+  // Show first section immediately — this is the critical fix
   showSection('hand-rankings');
   updateProgressUI();
   initOddsCalc();
@@ -509,7 +460,9 @@ document.addEventListener('DOMContentLoaded', () => {
   initProfileModal();
 
   document.querySelectorAll('.nav-item').forEach(item => {
-    item.addEventListener('click', () => showSection(item.dataset.section));
+    item.addEventListener('click', () => {
+      if(item.dataset.section) showSection(item.dataset.section);
+    });
   });
   document.querySelectorAll('.mark-complete-btn').forEach(btn => {
     btn.addEventListener('click', () => markSectionDone(btn.dataset.section));
@@ -522,5 +475,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelector('.sidebar')?.classList.remove('open');
     document.querySelector('.overlay')?.classList.remove('open');
   });
-  document.addEventListener('keydown', e => { if (e.key==='Escape') { closeCertModal(); document.getElementById('profile-modal')?.classList.remove('open'); } });
+  document.addEventListener('keydown', e => {
+    if(e.key==='Escape'){
+      closeCertModal();
+      document.getElementById('profile-modal')?.classList.remove('open');
+    }
+  });
 });

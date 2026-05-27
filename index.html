@@ -465,6 +465,7 @@
 <script type="module" src="scripts/auth.js"></script>
 
 <script>
+// ── Runs after main.js is loaded ──
 function setActiveNav(el) {
   document.querySelectorAll('.bnav-item').forEach(b => b.classList.remove('active'));
   if (el) el.classList.add('active');
@@ -507,7 +508,7 @@ window.downloadCertPreview = function() {
   const p = JSON.parse(localStorage.getItem('pokeriq_progress')||'{}');
   const SECS = ['hand-rankings','playstyle','odds-calc','pot-odds','positions','bluffing','bankroll','glossary'];
   const done = SECS.filter(s => p[s]).length;
-  if (done < 8) { alert('🔒 Complete all 8 sections first! ('+done+'/8 done)'); return; }
+  if (done < 8) { alert('Complete all 8 sections first! ('+done+'/8 done)'); return; }
   const canvas = document.getElementById('cert-canvas-preview');
   if (!canvas) return;
   const name = (document.getElementById('cert-name-preview')?.value || 'PokerIQ_Certificate').trim().replace(/\s+/g,'_');
@@ -526,35 +527,39 @@ function updateCertPageLock() {
   const progress = document.getElementById('cert-lock-progress');
   if (done === 8) {
     if (overlay) overlay.style.display = 'none';
-    if (btn) { btn.disabled = false; btn.style.opacity = '1'; btn.textContent = '⬇ Download Certificate'; }
+    if (btn) { btn.disabled = false; btn.style.opacity = '1'; btn.textContent = 'Download Certificate'; }
   } else {
     if (overlay) overlay.style.display = 'block';
-    if (progress) progress.textContent = done+'/8 sections complete — '+(8-done)+' remaining';
-    if (btn) { btn.disabled = true; btn.style.opacity = '0.4'; btn.textContent = '🔒 Complete all 8 sections ('+done+'/8)'; }
+    if (progress) progress.textContent = done+'/8 sections complete';
+    if (btn) { btn.disabled = true; btn.style.opacity = '0.4'; btn.textContent = 'Complete all 8 sections ('+done+'/8)'; }
   }
 }
 
-const _baseShow = window.showSection;
-window.showSection = function(id) {
-  _baseShow(id);
-  if (id === 'certificate') {
-    updateCertPageLock();
-    const name = localStorage.getItem('pokeriq_display_name') || window.currentUserName || '';
-    if (name) { const inp = document.getElementById('cert-name-preview'); if(inp) inp.value=name; }
-    previewCert(document.getElementById('cert-name-preview')?.value || name || 'Your Name');
-  }
-  if (id === 'leaderboard' && window._db) loadLeaderboard(window._db);
-  if (id === 'poker-table') {
-    updateBotSelectors();
-    const cd = document.getElementById('credits-display');
-    if (cd) cd.textContent = (window.playerCredits||500)+' cr';
-  }
-};
-
+// Extend showSection AFTER DOMContentLoaded so main.js has already set it up
 document.addEventListener('DOMContentLoaded', () => {
-  updateBotSelectors();
+  // Wrap showSection with extra behaviour
+  const _base = window.showSection;
+  window.showSection = function(id) {
+    if (typeof _base === 'function') _base(id);
+    if (id === 'certificate') {
+      updateCertPageLock();
+      const name = localStorage.getItem('pokeriq_display_name') || window.currentUserName || '';
+      const inp = document.getElementById('cert-name-preview');
+      if (inp && name && !inp.value) inp.value = name;
+      previewCert(inp?.value || name || 'Your Name');
+    }
+    if (id === 'leaderboard' && window._db) loadLeaderboard(window._db);
+    if (id === 'poker-table') {
+      if (typeof updateBotSelectors === 'function') updateBotSelectors();
+      const cd = document.getElementById('credits-display');
+      if (cd) cd.textContent = (window.playerCredits||500)+' cr';
+    }
+  };
+
   updateCertPageLock();
-  document.querySelector('.profile-edit-trigger-btn')?.addEventListener('click', () => {
+
+  // Pre-fill profile modal on open
+  document.querySelector('[onclick*="profile-modal"]')?.addEventListener('click', () => {
     const savedName = localStorage.getItem('pokeriq_display_name') || window.currentUserName || '';
     const savedCountry = localStorage.getItem('pokeriq_country') || 'Malaysia';
     const nameIn = document.getElementById('profile-name-input');
@@ -562,11 +567,18 @@ document.addEventListener('DOMContentLoaded', () => {
     if (nameIn && savedName) nameIn.value = savedName;
     if (countIn) countIn.value = savedCountry;
   });
+
+  // Close modals on backdrop click
   document.querySelectorAll('.modal').forEach(m => {
     m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
   });
+
+  // Credits display
   const cd = document.getElementById('credits-display');
   if (cd) cd.textContent = (window.playerCredits||500)+' cr';
+
+  // Bot selectors init
+  if (typeof updateBotSelectors === 'function') updateBotSelectors();
 });
 </script>
 </body>
