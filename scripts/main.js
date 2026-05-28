@@ -72,12 +72,12 @@ const SUIT_NAMES = {'♠':'spades','♥':'hearts','♦':'diamonds','♣':'clubs'
 
 function makeCardEl(rank, suit, color) {
   const d = document.createElement('div');
-  d.className = 'playing-card' + (color === 'red' ? ' red' : '');
-  d.style.cssText = 'width:52px;height:72px;background:#fff;border:1.5px solid #ddd;border-radius:6px;display:inline-flex;flex-direction:column;justify-content:space-between;padding:4px;font-family:monospace;font-size:0.85rem;font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,0.1);flex-shrink:0;color:'+(color==='red'?'#d43f3f':'#1a1a1a');
+  const c = color === 'red' ? '#d43f3f' : '#1a1a1a';
+  d.style.cssText = `width:52px;height:76px;background:#fff;border:1.5px solid #ddd;border-radius:6px;position:relative;display:inline-block;font-family:monospace;font-weight:700;color:${c};box-shadow:0 1px 4px rgba(0,0,0,0.1);flex-shrink:0`;
   d.innerHTML = `
-    <div style="line-height:1">${rank}<br><span style="font-size:0.7rem">${suit}</span></div>
-    <div style="font-size:1.4rem;text-align:center;line-height:1">${suit}</div>
-    <div style="line-height:1;transform:rotate(180deg)">${rank}<br><span style="font-size:0.7rem">${suit}</span></div>
+    <span style="position:absolute;top:3px;left:4px;font-size:0.8rem;line-height:1">${rank}<br></span>
+    <span style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:1.6rem;line-height:1">${suit}</span>
+    <span style="position:absolute;bottom:3px;right:4px;font-size:0.8rem;line-height:1;transform:rotate(180deg)">${rank}<br></span>
   `;
   return d;
 }
