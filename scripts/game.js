@@ -223,6 +223,7 @@ function doBotActions() {
   function next() {
     if(i>=active.length){advanceStreet();return;}
     const bot=active[i++];
+	if (bot.folded) { next(); return; } // ← add this line
     const allC=[...bot.hole,...GAME.board];
     const hs=GAME.board.length>=3?evalBest(allC).score:preflopStrength(bot.hole);
     const toCall=getToCall(bot);

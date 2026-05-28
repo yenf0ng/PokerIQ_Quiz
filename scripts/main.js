@@ -405,14 +405,19 @@ function initHandTester() {
   document.getElementById('tester-deal')?.addEventListener('click',dealTesterHand);
 }
 function dealTesterHand() {
-  const deck=mcShuffle(buildDeckStr());
-  testerCards=deck.slice(0,5);
-  const container=document.getElementById('tester-cards');
-  if(!container)return;
-  container.innerHTML='';
-  testerCards.forEach(c=>{
-    const rank=c.slice(0,-1),suit=c.slice(-1);
-    container.appendChild(makeCardEl(rank,suit,(suit==='♥'||suit==='♦')?'red':'black'));
+  const suits = ['♠','♥','♦','♣'];
+  const ranks = ['A','K','Q','J','T','9','8','7','6','5','4','3','2'];
+  const deck = [];
+  suits.forEach(s => ranks.forEach(r => deck.push({r, s})));
+  // shuffle
+  for(let i=deck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]];}
+  testerCards = deck.slice(0,5).map(c => c.r + c.s); // keep as strings for scoring
+  const container = document.getElementById('tester-cards');
+  if(!container) return;
+  container.innerHTML = '';
+  deck.slice(0,5).forEach(c => {
+    const color = (c.s==='♥'||c.s==='♦') ? 'red' : 'black';
+    container.appendChild(makeCardEl(c.r, c.s, color));
   });
   document.querySelectorAll('.guess-btn').forEach(b=>{b.classList.remove('correct','wrong');b.disabled=false;});
   document.getElementById('tester-result')?.classList.remove('show');
