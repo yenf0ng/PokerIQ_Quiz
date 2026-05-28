@@ -387,6 +387,7 @@ function showScore(sectionId) {
     '<button class="btn btn-secondary" onclick="restartQuiz(\''+sectionId+'\')">↺ Retry</button>'+
     '<span style="font-size:0.8rem;color:var(--text-muted)">'+(correct===questions.length?'🏆 Perfect!':correct>=questions.length/2?'Good job!':'Keep studying!')+'</span>';
   if(typeof window.addQuizScore==='function')window.addQuizScore(correct);
+  if(typeof window.trackQuizAttempt==='function')window.trackQuizAttempt(sectionId,correct,questions.length);
 }
 function restartQuiz(sectionId) {
   quizState[sectionId]={current:0,answers:{},submitted:{}};
@@ -405,19 +406,19 @@ function initHandTester() {
   document.getElementById('tester-deal')?.addEventListener('click',dealTesterHand);
 }
 function dealTesterHand() {
-  const suits = ['♠','♥','♦','♣'];
-  const ranks = ['A','K','Q','J','T','9','8','7','6','5','4','3','2'];
-  const deck = [];
-  suits.forEach(s => ranks.forEach(r => deck.push({r, s})));
-  // shuffle
+  const suits=['♠','♥','♦','♣'];
+  const ranks=['A','K','Q','J','T','9','8','7','6','5','4','3','2'];
+  const deck=[];
+  suits.forEach(s=>ranks.forEach(r=>deck.push({r,s})));
   for(let i=deck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]];}
-  testerCards = deck.slice(0,5).map(c => c.r + c.s); // keep as strings for scoring
-  const container = document.getElementById('tester-cards');
-  if(!container) return;
-  container.innerHTML = '';
-  deck.slice(0,5).forEach(c => {
-    const color = (c.s==='♥'||c.s==='♦') ? 'red' : 'black';
-    container.appendChild(makeCardEl(c.r, c.s, color));
+  const hand=deck.slice(0,5);
+  testerCards=hand.map(c=>c.r+c.s);
+  const container=document.getElementById('tester-cards');
+  if(!container)return;
+  container.innerHTML='';
+  hand.forEach(c=>{
+    const color=(c.s==='♥'||c.s==='♦')?'red':'black';
+    container.appendChild(makeCardEl(c.r,c.s,color));
   });
   document.querySelectorAll('.guess-btn').forEach(b=>{b.classList.remove('correct','wrong');b.disabled=false;});
   document.getElementById('tester-result')?.classList.remove('show');

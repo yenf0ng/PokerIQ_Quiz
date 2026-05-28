@@ -46,6 +46,8 @@
     <div class="nav-item" data-section="poker-table">♠ Play vs Bots</div>
     <div class="nav-item" data-section="leaderboard">🏆 Leaderboard</div>
     <div class="nav-item" data-section="certificate">🎓 Certificate</div>
+    <div class="nav-item" data-section="analytics">📊 Analytics</div>
+    <div class="nav-item" data-section="groups">👥 Friend Group</div>
   </nav>
 
   <!-- ── Main content ── -->
@@ -166,8 +168,8 @@
         <p class="section-intro">The most important math in poker. Master this and you'll never make a fundamentally losing call again.</p>
       </div>
       <div class="card"><h2 style="font-family:var(--font-display);font-size:1.2rem;color:var(--felt);margin-bottom:0.75rem">What Are Pot Odds?</h2><p style="font-size:0.9rem;color:var(--text-muted);line-height:1.7">Pot odds = the ratio of the call amount vs the total pot after your call. They tell you how often you need to win for the call to be profitable.</p><div class="info-box" style="margin-top:1rem"><strong>Formula:</strong> Pot Odds % = Call Amount ÷ (Pot + Call) × 100</div><p style="font-size:0.9rem;color:var(--text-muted);line-height:1.7;margin-top:0.75rem"><strong style="color:var(--felt)">Example:</strong> Pot $100, opponent bets $50. You call $50 into $150 total. Pot odds = 50/150 = 33%. You need to win 33%+ to break even.</p></div>
-      <div class="card" style="margin-top:1rem"><h2 style="font-family:var(--font-display);font-size:1.2rem;color:var(--felt);margin-bottom:0.75rem">Rule of 4 &amp; 2</h2><div class="grid-2"><div style="background:var(--bg);border-radius:var(--radius);padding:1rem"><div style="font-weight:600;font-size:0.85rem;color:var(--felt);margin-bottom:0.5rem">Common Draw Outs</div><table style="width:100%;font-size:0.8rem;border-collapse:collapse"><tbody><tr><td style="padding:3px 0;color:var(--text-muted)">Flush draw</td><td style="text-align:right;font-weight:500">9 outs</td></tr><tr><td style="padding:3px 0;color:var(--text-muted)">Open-ended straight</td><td style="text-align:right;font-weight:500">8 outs</td></tr><tr><td style="padding:3px 0;color:var(--text-muted)">Gutshot straight</td><td style="text-align:right;font-weight:500">4 outs</td></tr><tr><td style="padding:3px 0;color:var(--text-muted)">Two overcards</td><td style="text-align:right;font-weight:500">6 outs</td></tr></tbody></table></div><div style="background:var(--bg);border-radius:var(--radius);padding:1rem"><div style="font-weight:600;font-size:0.85rem;color:var(--felt);margin-bottom:0.5rem">Quick Formula</div><p style="font-size:0.8rem;color:var(--text-muted);line-height:1.6"><strong style="color:var(--felt)">On the flop:</strong> Outs × 4 ≈ equity %</p><p style="font-size:0.8rem;color:var(--text-muted);line-height:1.6;margin-top:0.4rem"><strong style="color:var(--felt)">On the turn:</strong> Outs × 2 ≈ equity %</p><p style="font-size:0.8rem;color:var(--text-muted);line-height:1.6;margin-top:0.4rem">Example: 9 outs flop → ~36%</p></div></div></div>
-      <div style="font-family:var(--font-display);font-size:1.2rem;color:var(--felt);margin:1.5rem 0 1rem;font-weight:600">Pot Odds Calculator</div>
+      <div class="card" style="margin-top:1rem"><h2 style="font-family:var(--font-display);font-size:1.2rem;color:var(--felt);margin-bottom:0.75rem">Rule of 4 &amp; 2</h2><div class="grid-2"><div style="background:var(--bg);border-radius:var(--radius);padding:1rem"><div style="font-weight:600;font-size:0.85rem;color:var(--felt);margin-bottom:0.5rem">Common Draw Outs</div><table style="width:100%;font-size:0.8rem;border-collapse:collapse"><tr><td style="padding:3px 0;color:var(--text-muted)">Flush draw</td><td style="text-align:right;font-weight:500">9 outs</td></tr><tr><td style="padding:3px 0;color:var(--text-muted)">Open-ended straight</td><td style="text-align:right;font-weight:500">8 outs</td></tr><tr><td style="padding:3px 0;color:var(--text-muted)">Gutshot straight</td><td style="text-align:right;font-weight:500">4 outs</td></tr><tr><td style="padding:3px 0;color:var(--text-muted)">Two overcards</td><td style="text-align:right;font-weight:500">6 outs</td></tr></table></div><div style="background:var(--bg);border-radius:var(--radius);padding:1rem"><div style="font-weight:600;font-size:0.85rem;color:var(--felt);margin-bottom:0.5rem">Quick Formula</div><p style="font-size:0.8rem;color:var(--text-muted);line-height:1.6"><strong style="color:var(--felt)">On the flop:</strong> Outs × 4 ≈ equity %</p><p style="font-size:0.8rem;color:var(--text-muted);line-height:1.6;margin-top:0.4rem"><strong style="color:var(--felt)">On the turn:</strong> Outs × 2 ≈ equity %</p><p style="font-size:0.8rem;color:var(--text-muted);line-height:1.6;margin-top:0.4rem">Example: 9 outs flop → ~36%</p></div></div></div></div>
+      <h2 style="font-family:var(--font-display);font-size:1.2rem;color:var(--felt);margin:1.5rem 0 1rem">Pot Odds Calculator</h2>
       <div class="pot-calc">
         <div class="grid-2">
           <div><label>Pot size ($)</label><input type="number" id="pot-size" placeholder="e.g. 100" min="0"></div>
@@ -337,6 +339,26 @@
       </div>
     </section>
 
+    <!-- ─── ANALYTICS ─── -->
+    <section id="sec-analytics" class="section-page">
+      <div class="section-header">
+        <div class="section-eyebrow">📊 Your stats</div>
+        <h1 class="section-title">Analytics</h1>
+        <p class="section-intro">Your learning progress, poker performance, and skill breakdown — all in one place.</p>
+      </div>
+      <div id="analytics-content"><div class="an-empty">Loading analytics…</div></div>
+    </section>
+
+    <!-- ─── FRIEND GROUP ─── -->
+    <section id="sec-groups" class="section-page">
+      <div class="section-header">
+        <div class="section-eyebrow">👥 Friend group</div>
+        <h1 class="section-title">Friend Group</h1>
+        <p class="section-intro">Create a private group with your friends. Track real game sessions and see who's the best player in your circle.</p>
+      </div>
+      <div id="group-content"><div class="an-empty">Loading…</div></div>
+    </section>
+
   </main>
 </div>
 
@@ -461,6 +483,8 @@
 <script src="scripts/game.js"></script>
 <script src="scripts/leaderboard.js"></script>
 <script src="scripts/profile.js"></script>
+<script src="scripts/analytics.js"></script>
+<script src="scripts/groups.js"></script>
 <script src="scripts/firebase-config.js" onerror="console.warn('firebase-config.js not found')"></script>
 <script type="module" src="scripts/auth.js"></script>
 
@@ -549,6 +573,12 @@ document.addEventListener('DOMContentLoaded', () => {
       previewCert(inp?.value || name || 'Your Name');
     }
     if (id === 'leaderboard' && window._db) loadLeaderboard(window._db);
+    if (id === 'analytics') {
+      if (typeof renderAnalytics === 'function') renderAnalytics();
+    }
+    if (id === 'groups') {
+      if (typeof renderGroupPage === 'function') renderGroupPage();
+    }
     if (id === 'poker-table') {
       if (typeof updateBotSelectors === 'function') updateBotSelectors();
       const cd = document.getElementById('credits-display');

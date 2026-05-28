@@ -223,7 +223,7 @@ function doBotActions() {
   function next() {
     if(i>=active.length){advanceStreet();return;}
     const bot=active[i++];
-	if (bot.folded) { next(); return; } // ← add this line
+    if(bot.folded){next();return;}
     const allC=[...bot.hole,...GAME.board];
     const hs=GAME.board.length>=3?evalBest(allC).score:preflopStrength(bot.hole);
     const toCall=getToCall(bot);
@@ -292,6 +292,14 @@ function awardPot(winner) {
   GAME.handOver=true;
   addLog(`🏆 ${winner.id==='player'?'You win':''+winner.name+' wins'} ${GAME.pot} cr!`);
   if(window.saveCredits) window.saveCredits(GAME.player.stack);
+  if(typeof window.trackBotGame==='function') {
+    window.trackBotGame(
+      GAME.result.winner.id==='player',
+      GAME.pot,
+      GAME.bots.map(b=>b.type),
+      GAME.player.handResult?.name||''
+    );
+  }
   gameRender();
   renderResult();
 }
