@@ -429,3 +429,25 @@
   .an-bot-grid { grid-template-columns:1fr 1fr; }
   .an-row { flex-direction:column; }
 }
+
+/* ── Upgraded player rows ── */
+.player-session-row { border:1px solid var(--border); border-radius:var(--radius); padding:0.5rem; background:var(--bg); margin-bottom:0.4rem; }
+.psr-main { display:flex; gap:0.4rem; align-items:center; margin-bottom:0.4rem; }
+.psr-main input { padding:0.4rem 0.5rem; border:1px solid var(--border); border-radius:6px; font-family:var(--font-body); font-size:0.78rem; background:var(--bg-card); color:var(--text); outline:none; flex:1; min-width:0; }
+.psr-main .ps-name { flex:2; }
+.psr-extra { display:flex; gap:0.4rem; }
+.psr-extra select, .psr-extra input { padding:0.35rem 0.5rem; border:1px solid var(--border); border-radius:6px; font-family:var(--font-body); font-size:0.75rem; background:var(--bg-card); color:var(--text); outline:none; }
+.psr-extra select { flex:1; }
+.psr-extra .ps-note { flex:2; }
+
+/* ── Upgraded session player cards ── */
+.session-player-card { border:1px solid var(--border); border-radius:var(--radius); padding:0.6rem 0.75rem; margin-bottom:0.4rem; }
+.session-player-card.pos { border-left:3px solid #2a7a2a; }
+.session-player-card.neg { border-left:3px solid var(--red); }
+.spc-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:2px; }
+.spc-name { font-weight:500; font-size:0.875rem; color:var(--felt); }
+.spc-net { font-weight:600; font-size:0.875rem; }
+.spc-net.pos { color:#2a7a2a; }
+.spc-net.neg { color:var(--red); }
+.spc-detail { font-size:0.75rem; color:var(--text-muted); margin-top:2px; }
+.spc-note { font-size:0.72rem; color:var(--text-light); font-style:italic; margin-top:3px; }

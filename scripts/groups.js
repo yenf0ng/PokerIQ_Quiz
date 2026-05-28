@@ -112,25 +112,26 @@ window.leaveGroup = function() {
 
 // ── Log session ────────────────────────────────
 window.logSession = async function() {
-  if (!window._db || !window.currentUserId) {
-    alert('Sign in to log sessions.');
-    return;
-  }
+  if (!window._db || !window.currentUserId) { alert('Sign in to log sessions.'); return; }
   const groupId = localStorage.getItem('pokeriq_group_id');
   if (!groupId) { alert('Join a group first.'); return; }
 
-  const date    = document.getElementById('session-date')?.value;
+  const date     = document.getElementById('session-date')?.value;
   const location = document.getElementById('session-location')?.value?.trim() || 'Home game';
-  const notes   = document.getElementById('session-notes')?.value?.trim() || '';
+  const notes    = document.getElementById('session-notes')?.value?.trim() || '';
 
-  // Collect player rows
   const rows = document.querySelectorAll('.player-session-row');
   const players = [];
   rows.forEach(row => {
-    const name   = row.querySelector('.ps-name')?.value?.trim();
-    const buyin  = parseFloat(row.querySelector('.ps-buyin')?.value)||0;
-    const result = parseFloat(row.querySelector('.ps-result')?.value)||0;
-    if (name) players.push({name, buyin, result, net: result-buyin});
+    const name      = row.querySelector('.ps-name')?.value?.trim();
+    const buyin     = parseFloat(row.querySelector('.ps-buyin')?.value)||0;
+    const rebuys    = parseFloat(row.querySelector('.ps-rebuys')?.value)||0;
+    const cashout   = parseFloat(row.querySelector('.ps-result')?.value)||0;
+    const bestHand  = row.querySelector('.ps-besthand')?.value||'';
+    const playerNote= row.querySelector('.ps-note')?.value?.trim()||'';
+    const totalIn   = buyin + rebuys;
+    const net       = cashout - totalIn;
+    if (name) players.push({name, buyin, rebuys, totalIn, cashout, net, bestHand, note: playerNote});
   });
 
   if (players.length === 0) { alert('Add at least one player.'); return; }
@@ -140,12 +141,23 @@ window.logSession = async function() {
 
   try {
     const {collection, addDoc, serverTimestamp} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-    await addDoc(collection(window._db,'groups',groupId,'sessions'), {
+    const sessionData = {
       date: date || new Date().toISOString().split('T')[0],
       location, notes, players,
       loggedBy: window.currentUserId,
       loggedByName: localStorage.getItem('pokeriq_display_name') || window.currentUserName || 'Player',
       createdAt: serverTimestamp()
+    };
+    await addDoc(collection(window._db,'groups',groupId,'sessions'), sessionData);
+
+    // Save your own result to personal history
+    const myName = localStorage.getItem('pokeriq_display_name') || window.currentUserName || '';
+    const myResult = players.find(p => p.name.toLowerCase() === myName.toLowerCase()) || players[0];
+    savePersonalSession({
+      date: sessionData.date,
+      location: sessionData.location,
+      groupName: localStorage.getItem('pokeriq_group_name') || 'Group',
+      ...myResult
     });
 
     if (btn) { btn.textContent = 'Log Session'; btn.disabled = false; }
@@ -161,16 +173,27 @@ window.logSession = async function() {
 };
 
 // ── Player row management ──────────────────────
+const BEST_HANDS = ['—','Royal Flush','Straight Flush','Four of a Kind','Full House','Flush','Straight','Three of a Kind','Two Pair','One Pair'];
+
 window.addPlayerRow = function() {
   const container = document.getElementById('player-rows');
   if (!container) return;
   const row = document.createElement('div');
   row.className = 'player-session-row';
   row.innerHTML = `
-    <input class="ps-name" placeholder="Player name" style="flex:2">
-    <input class="ps-buyin" type="number" placeholder="Buy-in" min="0" step="0.01" style="flex:1">
-    <input class="ps-result" type="number" placeholder="Cash out" min="0" step="0.01" style="flex:1">
-    <button onclick="this.parentElement.remove()" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:1.1rem;padding:0 0.25rem">×</button>
+    <div class="psr-main">
+      <input class="ps-name" placeholder="Player name">
+      <input class="ps-buyin"   type="number" placeholder="Buy-in"  min="0" step="0.01">
+      <input class="ps-rebuys" type="number" placeholder="Rebuys"   min="0" step="0.01">
+      <input class="ps-result"  type="number" placeholder="Cash-out" min="0" step="0.01">
+      <button onclick="this.closest('.player-session-row').remove()" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:1.1rem;padding:0 0.25rem;flex-shrink:0">×</button>
+    </div>
+    <div class="psr-extra">
+      <select class="ps-besthand">
+        ${BEST_HANDS.map(h=>`<option value="${h}">${h}</option>`).join('')}
+      </select>
+      <input class="ps-note" placeholder="Note e.g. went on tilt, lucky river…">
+    </div>
   `;
   container.appendChild(row);
 };
@@ -193,34 +216,41 @@ window.loadSessions = async function() {
     const {collection, getDocs, query, orderBy, limit} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     const q = query(collection(window._db,'groups',groupId,'sessions'), orderBy('createdAt','desc'), limit(20));
     const snap = await getDocs(q);
-
     if (snap.empty) { el.innerHTML = '<div class="an-empty">No sessions logged yet. Log your first game!</div>'; return; }
 
     el.innerHTML = snap.docs.map(d => {
       const s = d.data();
       const winner = s.players?.reduce((a,b) => a.net>b.net?a:b, s.players[0]);
-      const totalPot = s.players?.reduce((sum,p)=>sum+p.buyin,0)||0;
+      const totalPot = s.players?.reduce((sum,p)=>sum+(p.buyin||0)+(p.rebuys||0),0)||0;
       return `
         <div class="session-card">
           <div class="session-header">
             <div>
               <div class="session-title">${s.location||'Home game'}</div>
-              <div class="session-date">${s.date||'—'} · ${s.players?.length||0} players · ${totalPot} total pot</div>
+              <div class="session-date">${s.date||'—'} · ${s.players?.length||0} players · Total in: ${totalPot}</div>
             </div>
-            <div class="session-winner">🏆 ${winner?.name||'—'} +${winner?.net>=0?'+':''}${winner?.net||0}</div>
+            <div class="session-winner">🏆 ${winner?.name||'—'} ${winner?.net>=0?'+':''}${winner?.net||0}</div>
           </div>
           <div class="session-players">
             ${(s.players||[]).map(p=>`
-              <div class="session-player ${p.net>=0?'pos':'neg'}">
-                <span>${p.name}</span>
-                <span>${p.net>=0?'+':''}${p.net}</span>
+              <div class="session-player-card ${p.net>=0?'pos':'neg'}">
+                <div class="spc-top">
+                  <span class="spc-name">${p.name}</span>
+                  <span class="spc-net ${p.net>=0?'pos':'neg'}">${p.net>=0?'+':''}${p.net}</span>
+                </div>
+                <div class="spc-detail">
+                  In: ${p.totalIn||p.buyin}${p.rebuys?` (${p.buyin}+${p.rebuys} rebuy)`:''}
+                  · Out: ${p.cashout||p.result||0}
+                  ${p.bestHand&&p.bestHand!=='—'?`· 🃏 ${p.bestHand}`:''}
+                </div>
+                ${p.note?`<div class="spc-note">${p.note}</div>`:''}
               </div>`).join('')}
           </div>
-          ${s.notes?`<div class="session-notes">${s.notes}</div>`:''}
+          ${s.notes?`<div class="session-notes">📝 ${s.notes}</div>`:''}
         </div>`;
     }).join('');
   } catch(e) {
-    el.innerHTML = '<div style="color:var(--red);font-size:0.85rem">Error loading sessions: '+e.message+'</div>';
+    el.innerHTML = '<div style="color:var(--red);font-size:0.85rem">Error: '+e.message+'</div>';
   }
 };
 
@@ -272,7 +302,56 @@ window.loadGroupLeaderboard = async function() {
   }
 };
 
-// ── Render group page ──────────────────────────
+// ── Personal session history ───────────────────
+function savePersonalSession(entry) {
+  try {
+    const key = 'pokeriq_my_sessions';
+    const existing = JSON.parse(localStorage.getItem(key)||'[]');
+    existing.unshift({...entry, savedAt: Date.now()});
+    localStorage.setItem(key, JSON.stringify(existing.slice(0,100)));
+  } catch(e) {}
+}
+
+function renderPersonalHistory() {
+  const sessions = JSON.parse(localStorage.getItem('pokeriq_my_sessions')||'[]');
+  if (sessions.length === 0) return '<div class="an-empty">No personal sessions yet. Log a group session to see your history here.</div>';
+
+  const totalNet    = sessions.reduce((s,e) => s+(e.net||0), 0);
+  const totalBuyin  = sessions.reduce((s,e) => s+(e.totalIn||e.buyin||0), 0);
+  const wins        = sessions.filter(e => (e.net||0) > 0).length;
+  const bestSession = sessions.reduce((a,b) => (a.net||0)>(b.net||0)?a:b, sessions[0]);
+  const bestHands   = sessions.filter(e => e.bestHand && e.bestHand !== '—').map(e=>e.bestHand);
+  const bestHand    = bestHands.length ? bestHands[0] : '—';
+
+  return `
+    <div class="an-grid-4" style="margin-bottom:1rem">
+      <div class="an-stat"><div class="an-num">${sessions.length}</div><div class="an-lbl">Sessions</div></div>
+      <div class="an-stat"><div class="an-num" style="color:${totalNet>=0?'#2a7a2a':'var(--red)'}">${totalNet>=0?'+':''}${totalNet}</div><div class="an-lbl">Total P&L</div></div>
+      <div class="an-stat"><div class="an-num">${wins}/${sessions.length}</div><div class="an-lbl">Winning sessions</div></div>
+      <div class="an-stat"><div class="an-num" style="font-size:0.9rem">${bestSession.net>=0?'+':''}${bestSession.net}</div><div class="an-lbl">Best session</div></div>
+    </div>
+    ${bestHand!=='—'?`<div class="info-box" style="margin-bottom:1rem"><strong>Best hand ever recorded:</strong> ${bestHand}</div>`:''}
+    <div style="display:flex;flex-direction:column;gap:0.75rem">
+      ${sessions.map(e => `
+        <div class="session-card">
+          <div class="session-header">
+            <div>
+              <div class="session-title">${e.location||'Home game'}</div>
+              <div class="session-date">${e.date||'—'} · ${e.groupName||'Group'}</div>
+            </div>
+            <div class="session-winner" style="color:${(e.net||0)>=0?'#2a7a2a':'var(--red)'}">
+              ${(e.net||0)>=0?'+':''}${e.net||0}
+            </div>
+          </div>
+          <div class="spc-detail" style="font-size:0.8rem;color:var(--text-muted);margin-top:0.25rem">
+            In: ${e.totalIn||e.buyin||0}${e.rebuys?` (${e.buyin}+${e.rebuys} rebuy)`:''} 
+            · Out: ${e.cashout||0}
+            ${e.bestHand&&e.bestHand!=='—'?`· 🃏 ${e.bestHand}`:''}
+          </div>
+          ${e.note?`<div class="spc-note">${e.note}</div>`:''}
+        </div>`).join('')}
+    </div>`;
+}
 window.renderGroupPage = function() {
   const el = document.getElementById('group-content');
   if (!el) return;
@@ -354,21 +433,26 @@ window.renderGroupPage = function() {
               <input id="session-location" placeholder="Home game" style="width:100%;padding:0.5rem;border:1px solid var(--border);border-radius:var(--radius);font-family:var(--font-body);font-size:0.8rem;background:var(--bg);color:var(--text)">
             </div>
           </div>
-          <div style="font-size:0.75rem;font-weight:500;color:var(--text-muted);margin-bottom:0.4rem">Players (name · buy-in · cash-out)</div>
-          <div id="player-rows" style="display:flex;flex-direction:column;gap:0.4rem;margin-bottom:0.5rem"></div>
+          <div style="font-size:0.75rem;font-weight:500;color:var(--text-muted);margin-bottom:0.4rem">Players — name · buy-in · rebuys · cash-out · best hand · note</div>
+          <div id="player-rows" style="display:flex;flex-direction:column;gap:0.5rem;margin-bottom:0.5rem"></div>
           <button type="button" class="btn btn-secondary" style="font-size:0.75rem;padding:0.35rem 0.75rem;margin-bottom:0.75rem" onclick="addPlayerRow()">+ Add player</button>
           <div>
-            <label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:3px">Notes (optional)</label>
-            <input id="session-notes" placeholder="Bad beat story, memorable hands…" style="width:100%;padding:0.5rem;border:1px solid var(--border);border-radius:var(--radius);font-family:var(--font-body);font-size:0.8rem;background:var(--bg);color:var(--text);margin-bottom:0.75rem">
+            <label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:3px">Session notes (optional)</label>
+            <input id="session-notes" placeholder="e.g. Wild game, everyone went all-in pre-flop…" style="width:100%;padding:0.5rem;border:1px solid var(--border);border-radius:var(--radius);font-family:var(--font-body);font-size:0.8rem;background:var(--bg);color:var(--text);margin-bottom:0.75rem">
           </div>
           <button type="submit" class="btn btn-primary" id="log-session-btn" style="width:100%">Log Session</button>
         </form>
       </div>
     </div>
 
-    <div class="an-card">
-      <div class="an-card-title">Session history</div>
+    <div class="an-card" style="margin-bottom:1.25rem">
+      <div class="an-card-title">Group session history</div>
       <div id="sessions-list"><div class="an-empty">Loading sessions…</div></div>
+    </div>
+
+    <div class="an-card">
+      <div class="an-card-title">My personal history <span style="font-size:0.7rem;color:var(--text-light);font-weight:400;text-transform:none;letter-spacing:0">— saved locally, persists after leaving group</span></div>
+      <div id="personal-history">${renderPersonalHistory()}</div>
     </div>
   `;
 
