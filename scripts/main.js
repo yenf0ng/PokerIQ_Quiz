@@ -152,8 +152,8 @@ function buildDeckStr() {
 }
 
 function calcHandScore(cards) {
-  const rs = cards.map(c => c.slice(0,-1));
-  const ss = cards.map(c => c.slice(-1));
+  const rs = cards.map(c => [...c].slice(0,-1).join(''));
+  const ss = cards.map(c => [...c].slice(-1)[0]);
   const vs = rs.map(r => '23456789TJQKA'.indexOf(r)).sort((a,b) => b-a);
   const flush = ss.every(s => s===ss[0]);
   const straight = vs.every((v,i) => i===0||vs[i-1]-v===1) ||
