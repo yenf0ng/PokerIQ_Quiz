@@ -412,26 +412,30 @@ function dealTesterHand() {
   suits.forEach(s=>ranks.forEach(r=>deck.push({r,s})));
   for(let i=deck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]];}
   const hand=deck.slice(0,5);
-  testerCards=hand.map(c=>c.r+c.s);
+  testerCards = hand;
   const container=document.getElementById('tester-cards');
   if(!container)return;
   container.innerHTML='';
-  hand.forEach(c=>{
-    const color=(c.s==='♥'||c.s==='♦')?'red':'black';
-    container.appendChild(makeCardEl(c.r,c.s,color));
+  hand.forEach(c => {
+    if (!c.r || !c.s) return; // guard against undefined
+    const color = (c.s==='♥'||c.s==='♦') ? 'red' : 'black';
+    container.appendChild(makeCardEl(c.r, c.s, color));
   });
   document.querySelectorAll('.guess-btn').forEach(b=>{b.classList.remove('correct','wrong');b.disabled=false;});
   document.getElementById('tester-result')?.classList.remove('show');
 }
-window.guessHand=function(idx){
-  const score=calcHandScore(testerCards);
-  document.querySelectorAll('.guess-btn').forEach((b,i)=>{
-    b.disabled=true;
-    if(i===score)b.classList.add('correct');
-    else if(i===idx&&idx!==score)b.classList.add('wrong');
+window.guessHand = function(idx) {
+  const score = calcHandScore(testerCards.map(c => c.r + c.s));
+  document.querySelectorAll('.guess-btn').forEach((b,i) => {
+    b.disabled = true;
+    if(i===score) b.classList.add('correct');
+    else if(i===idx && idx!==score) b.classList.add('wrong');
   });
-  const res=document.getElementById('tester-result');
-  if(res){res.classList.add('show');res.innerHTML='<div class="tester-result-name">'+(idx===score?'✓ Correct! ':'✗ Wrong — it\'s a ')+HAND_TYPES[score]+'</div>';}
+  const res = document.getElementById('tester-result');
+  if(res) {
+    res.classList.add('show');
+    res.innerHTML = '<div class="tester-result-name">'+(idx===score?'✓ Correct! ':'✗ Wrong — it\'s a ')+HAND_TYPES[score]+'</div>';
+  }
 };
 
 // ── Profile modal wiring ────────────────────────
